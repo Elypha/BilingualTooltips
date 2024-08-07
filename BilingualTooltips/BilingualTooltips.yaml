@@ -1,0 +1,23 @@
+author: Elypha
+name: BilingualTooltips
+repo_url: https://github.com/Elypha/BilingualTooltips
+punchline: The simple but ultimate market board plugin.
+description: |
+  Yes, we have tooltips displayed in two languages now. You paid SE for 4 languages so make good use of it.
+
+  - Wanna know and learn how that item is written in another language? - No problem.
+  - Got fed up of カタカナ and would rather read the English words? - We've got you.
+
+tags:
+  - Tooltip
+  - Language
+  - Translation
+  - Elypha
+category_tags:
+  - Utility
+  - UI
+  - Other
+
+# in the images folder on D17:
+# - icon should be 512x512 named with 'icon.png'
+# - preview images shoulld be 730x380 named with 'image1.png' up to 5

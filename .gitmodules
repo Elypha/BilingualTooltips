@@ -1,0 +1,3 @@
+[submodule "Miosuke"]
+	path = Miosuke
+	url = https://github.com/Elypha/Miosuke.git
