@@ -15,6 +15,7 @@ public class BilingualTooltipsConfig : IPluginConfiguration
 
     // ----------------- General -----------------
     public bool EnableTheme { get; set; } = false;
+    public GameLanguage TooltipLanguage { get; set; } = GameLanguage.Japanese;
     public ushort ItemNameColourKey { get; set; } = 3;
     public ushort ItemDescriptionColourKey { get; set; } = 3;
     public ushort ActionNameColourKey { get; set; } = 3;

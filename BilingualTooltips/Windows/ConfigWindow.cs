@@ -71,7 +71,37 @@ public class ConfigWindow : Window, IDisposable
         float padding = 0.8f;
         string suffix;
 
+
+        // ----------------- Language -----------------
+        // ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
+        suffix = $"###{plugin.Name}[Language]";
+        ImGui.TextColored(Miosuke.UI.ColourKhaki, "Language");
+        ImGui.Separator();
+
+        // TooltipLanguage
+        ImGui.Text("Tooltip");
+        ImGui.SameLine();
+        ImGui.SetNextItemWidth(200);
+        if (ImGui.BeginCombo($"{suffix}TooltipLanguage", plugin.Config.TooltipLanguage.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == plugin.Config.TooltipLanguage))
+                {
+                    plugin.Config.TooltipLanguage = type;
+                    plugin.Config.Save();
+                }
+            }
+
+            ImGui.EndCombo();
+        }
+        ImGuiComponents.HelpMarker(
+            "The language you want to display additionally in the tooltip."
+        );
+
+
         // ----------------- Tooltips -----------------
+        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
         suffix = $"###{plugin.Name}[TooltipColour]";
         ImGui.TextColored(Miosuke.UI.ColourKhaki, "Tooltip Colour");
         ImGui.Separator();
@@ -136,9 +166,8 @@ public class ConfigWindow : Window, IDisposable
             );
 
 
-        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
-
         // ----------------- UI -----------------
+        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
         suffix = $"###{plugin.Name}[UI]";
         ImGui.TextColored(Miosuke.UI.ColourKhaki, "UI");
         ImGui.Separator();

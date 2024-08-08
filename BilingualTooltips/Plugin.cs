@@ -132,4 +132,14 @@ public sealed partial class Plugin : IDalamudPlugin
     public void OnFrameUpdate(IFramework framework)
     {
     }
+
+
+}
+
+public enum GameLanguage
+{
+    Japanese,
+    English,
+    German,
+    French,
 }
