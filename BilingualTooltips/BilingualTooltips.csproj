@@ -4,10 +4,10 @@
 
   <PropertyGroup>
     <Title>BilingualTooltips</Title>
-    <Description>The simple but ultimate market board plugin.</Description>
+    <Description>In case the WoL speaks more than one language</Description>
     <Authors>Elypha</Authors>
     <Copyright>Elypha</Copyright>
-    <Version>1.3.0.3</Version>
+    <Version>0.1.0.0</Version>
     <LangVersion>latest</LangVersion>
     <Platforms>x64</Platforms>
     <TargetFramework>net8.0-windows</TargetFramework>
