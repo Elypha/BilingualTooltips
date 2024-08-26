@@ -55,6 +55,8 @@ public class TooltipHandler
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PreRequestedUpdate, "ItemDetail", ItemDetail_PreRequestedUpdate_Handler);
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PostRequestedUpdate, "ItemDetail", ItemDetail_PostRequestedUpdate_Handler);
         // Service.AddonLifecycle.UnregisterListener(AddonEvent.PreRequestedUpdate, "ActionDetail", ActionDetailOnRequestedUpdate);
+
+        RemoveItemNameTranslationOnUnload(ItemNameNodeId);
     }
 
 
@@ -113,14 +115,13 @@ public class TooltipHandler
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[26];
 
         UpdateItemTooltipData();
+        RemoveItemNameTranslation(addon, ItemNameNodeId);
 
         var name_node = addon->GetTextNodeById(32);
         float x, y;
         name_node->GetPositionFloat(&x, &y);
         name_node->SetPositionFloat(x, 20);
         var pos_y = name_node->AtkResNode.Y;
-
-        RemoveItemNameTranslation(addon, ItemNameNodeId);
 
         AddItemDescriptionTranslation(addon, stringArrayData);
     }
@@ -237,8 +238,22 @@ public class TooltipHandler
             {
                 var insertNode = addon->GetNodeById(2);
                 if (insertNode == null) return;
+                customNode->AtkResNode.ToggleVisibility(false);
             }
+
         }
+    }
+
+    private unsafe void RemoveItemNameTranslationOnUnload(int nodeId)
+    {
+        var addon = Service.GameGui.GetAddonByName("ItemDetail");
+        var addonPtr = (AtkUnitBase*)addon;
+        RemoveItemNameTranslation(addonPtr, nodeId);
+
+        var name_node = addonPtr->GetTextNodeById(32);
+        float x, y;
+        name_node->GetPositionFloat(&x, &y);
+        name_node->SetPositionFloat(x, 14);
     }
 
 
