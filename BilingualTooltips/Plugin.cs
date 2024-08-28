@@ -126,6 +126,20 @@ public sealed partial class Plugin : IDalamudPlugin
             case "config":
                 ConfigWindow.Toggle();
                 break;
+            default:
+                if (args.StartsWith("enabled"))
+                {
+                    var arg = args[7..].Trim();
+                    if (bool.TryParse(arg, out var result))
+                    {
+                        ToggleEnabled(result);
+                    }
+                    else
+                    {
+                        ToggleEnabled();
+                    }
+                }
+                break;
         }
     }
 
@@ -133,6 +147,21 @@ public sealed partial class Plugin : IDalamudPlugin
     {
     }
 
+    public void ToggleEnabled(bool? target = null)
+    {
+        if (target == null)
+        {
+            if (Config.Enabled) TooltipHandler.Reset();
+            Config.Enabled = !Config.Enabled;
+        }
+        else
+        {
+            if (Config.Enabled == (bool)target) return;
+            if (Config.Enabled && !(bool)target) TooltipHandler.Reset();
+            Config.Enabled = (bool)target;
+        }
+        Config.Save();
+    }
 
 }
 
@@ -142,4 +171,5 @@ public enum GameLanguage
     English,
     German,
     French,
+    Off,
 }

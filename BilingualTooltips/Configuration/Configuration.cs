@@ -14,12 +14,20 @@ public class BilingualTooltipsConfig : IPluginConfiguration
     public int Version { get; set; } = 0;
 
     // ----------------- General -----------------
-    public bool EnableTheme { get; set; } = false;
-    public GameLanguage TooltipLanguage { get; set; } = GameLanguage.Japanese;
+    public bool Enabled { get; set; } = true;
+    public bool TemporaryEnableOnly { get; set; } = false;
+    public VirtualKey[] TemporaryEnableHotkey { get; set; } = [VirtualKey.CONTROL, VirtualKey.X];
+    public GameLanguage LanguageItemTooltipName { get; set; } = GameLanguage.Japanese;
+    public GameLanguage LanguageItemTooltipDescription { get; set; } = GameLanguage.Japanese;
+    public GameLanguage LanguageActionTooltipName { get; set; } = GameLanguage.Japanese;
+    public GameLanguage LanguageActionTooltipDescription { get; set; } = GameLanguage.Japanese;
     public ushort ItemNameColourKey { get; set; } = 3;
     public ushort ItemDescriptionColourKey { get; set; } = 3;
     public ushort ActionNameColourKey { get; set; } = 3;
     public ushort ActionDescriptionColourKey { get; set; } = 3;
+    public bool EnableTheme { get; set; } = false;
+    public float OffsetItemNameOriginal { get; set; } = 6;
+    public float OffsetItemNameTranslation { get; set; } = -2.5f;
     public List<string> RegexList { get; set; } = new List<string>();
 
 

@@ -55,8 +55,18 @@ public class TooltipHandler
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PreRequestedUpdate, "ItemDetail", ItemDetail_PreRequestedUpdate_Handler);
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PostRequestedUpdate, "ItemDetail", ItemDetail_PostRequestedUpdate_Handler);
         // Service.AddonLifecycle.UnregisterListener(AddonEvent.PreRequestedUpdate, "ActionDetail", ActionDetailOnRequestedUpdate);
+    }
 
-        RemoveItemNameTranslationOnUnload(ItemNameNodeId);
+    public unsafe void Reset()
+    {
+        var addon = Service.GameGui.GetAddonByName("ItemDetail");
+        var addonPtr = (AtkUnitBase*)addon;
+        RemoveItemNameTranslation(addonPtr, ItemNameNodeId);
+
+        var name_node = addonPtr->GetTextNodeById(32);
+        float x, y;
+        name_node->GetPositionFloat(&x, &y);
+        name_node->SetPositionFloat(x, 14);
     }
 
 
@@ -82,22 +92,33 @@ public class TooltipHandler
         {
             itemId %= 500000;
         }
-        switch (plugin.Config.TooltipLanguage)
+        switch (plugin.Config.LanguageItemTooltipName)
         {
             case GameLanguage.Japanese:
                 itemNameTranslation = SheetItemJp.GetRow((uint)itemId)?.Name ?? "Not found";
-                itemDescriptionTranslation = SheetItemJp.GetRow((uint)itemId)?.Description ?? "Not found";
                 break;
             case GameLanguage.English:
                 itemNameTranslation = SheetItemEn.GetRow((uint)itemId)?.Name ?? "Not found";
-                itemDescriptionTranslation = SheetItemEn.GetRow((uint)itemId)?.Description ?? "Not found";
                 break;
             case GameLanguage.German:
                 itemNameTranslation = SheetItemDe.GetRow((uint)itemId)?.Name ?? "Not found";
-                itemDescriptionTranslation = SheetItemDe.GetRow((uint)itemId)?.Description ?? "Not found";
                 break;
             case GameLanguage.French:
                 itemNameTranslation = SheetItemFr.GetRow((uint)itemId)?.Name ?? "Not found";
+                break;
+        }
+        switch (plugin.Config.LanguageItemTooltipDescription)
+        {
+            case GameLanguage.Japanese:
+                itemDescriptionTranslation = SheetItemJp.GetRow((uint)itemId)?.Description ?? "Not found";
+                break;
+            case GameLanguage.English:
+                itemDescriptionTranslation = SheetItemEn.GetRow((uint)itemId)?.Description ?? "Not found";
+                break;
+            case GameLanguage.German:
+                itemDescriptionTranslation = SheetItemDe.GetRow((uint)itemId)?.Description ?? "Not found";
+                break;
+            case GameLanguage.French:
                 itemDescriptionTranslation = SheetItemFr.GetRow((uint)itemId)?.Description ?? "Not found";
                 break;
         }
@@ -107,6 +128,8 @@ public class TooltipHandler
     private unsafe void ItemDetail_PreRequestedUpdate_Handler(AddonEvent type, AddonArgs args)
     {
         if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
+        if (!plugin.Config.Enabled) return;
+        if (plugin.Config.TemporaryEnableOnly && !Hotkey.IsActive(plugin.Config.TemporaryEnableHotkey)) return;
 
         var addon = (AtkUnitBase*)args.Addon;
         if (!addon->IsVisible) return;
@@ -115,21 +138,31 @@ public class TooltipHandler
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[26];
 
         UpdateItemTooltipData();
-        RemoveItemNameTranslation(addon, ItemNameNodeId);
 
-        var name_node = addon->GetTextNodeById(32);
-        float x, y;
-        name_node->GetPositionFloat(&x, &y);
-        name_node->SetPositionFloat(x, 20);
-        var pos_y = name_node->AtkResNode.Y;
+        if (plugin.Config.LanguageItemTooltipName != GameLanguage.Off)
+        {
+            RemoveItemNameTranslation(addon, ItemNameNodeId);
+            var name_node = addon->GetTextNodeById(32);
+            var offset = plugin.Config.OffsetItemNameOriginal;
+            float x, y;
+            name_node->GetPositionFloat(&x, &y);
+            name_node->SetPositionFloat(x, 14 + offset);
+            var pos_y = name_node->AtkResNode.Y;
+        }
 
-        AddItemDescriptionTranslation(addon, stringArrayData);
+        if (plugin.Config.LanguageItemTooltipDescription != GameLanguage.Off)
+        {
+            AddItemDescriptionTranslation(addon, stringArrayData);
+        }
     }
 
 
     private unsafe void ItemDetail_PostRequestedUpdate_Handler(AddonEvent type, AddonArgs args)
     {
         if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
+        if (!plugin.Config.Enabled) return;
+        if (plugin.Config.TemporaryEnableOnly && !Hotkey.IsActive(plugin.Config.TemporaryEnableHotkey)) return;
+        if (plugin.Config.LanguageItemTooltipName == GameLanguage.Off) return;
 
         var addon = (AtkUnitBase*)args.Addon;
         if (!addon->IsVisible) return;
@@ -224,7 +257,8 @@ public class TooltipHandler
 
         textNode->ResizeNodeForCurrentText();
         var itemNameNode = addon->GetTextNodeById(32);
-        textNode->AtkResNode.SetPositionFloat(itemNameNode->AtkResNode.X, itemNameNode->AtkResNode.Y - 2.5f);
+        var offset = plugin.Config.OffsetItemNameTranslation;
+        textNode->AtkResNode.SetPositionFloat(itemNameNode->AtkResNode.X, itemNameNode->AtkResNode.Y + offset);
     }
 
 
@@ -242,18 +276,6 @@ public class TooltipHandler
             }
 
         }
-    }
-
-    private unsafe void RemoveItemNameTranslationOnUnload(int nodeId)
-    {
-        var addon = Service.GameGui.GetAddonByName("ItemDetail");
-        var addonPtr = (AtkUnitBase*)addon;
-        RemoveItemNameTranslation(addonPtr, nodeId);
-
-        var name_node = addonPtr->GetTextNodeById(32);
-        float x, y;
-        name_node->GetPositionFloat(&x, &y);
-        name_node->SetPositionFloat(x, 14);
     }
 
 
