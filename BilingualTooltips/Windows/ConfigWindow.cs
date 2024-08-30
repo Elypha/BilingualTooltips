@@ -93,7 +93,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.Text("┗");
         ImGui.SameLine();
         var TemporaryEnableOnly = plugin.Config.TemporaryEnableOnly;
-        if (ImGui.Checkbox($"(Testing) but only upon hotkey{suffix}TemporaryEnableOnly", ref TemporaryEnableOnly))
+        if (ImGui.Checkbox($"but only upon hotkey{suffix}TemporaryEnableOnly", ref TemporaryEnableOnly))
         {
             if (TemporaryEnableOnly) plugin.TooltipHandler.Reset();
             plugin.Config.TemporaryEnableOnly = TemporaryEnableOnly;
