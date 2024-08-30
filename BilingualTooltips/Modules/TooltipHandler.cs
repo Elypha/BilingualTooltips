@@ -129,6 +129,7 @@ public class TooltipHandler
     {
         if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
         if (!plugin.Config.Enabled) return;
+        if (plugin.Config.LanguageItemTooltipName != GameLanguage.Off) Reset();
         if (plugin.Config.TemporaryEnableOnly && !Hotkey.IsActive(plugin.Config.TemporaryEnableHotkey)) return;
 
         var addon = (AtkUnitBase*)args.Addon;
@@ -138,17 +139,6 @@ public class TooltipHandler
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[26];
 
         UpdateItemTooltipData();
-
-        if (plugin.Config.LanguageItemTooltipName != GameLanguage.Off)
-        {
-            RemoveItemNameTranslation(addon, ItemNameNodeId);
-            var name_node = addon->GetTextNodeById(32);
-            var offset = plugin.Config.OffsetItemNameOriginal;
-            float x, y;
-            name_node->GetPositionFloat(&x, &y);
-            name_node->SetPositionFloat(x, 14 + offset);
-            var pos_y = name_node->AtkResNode.Y;
-        }
 
         if (plugin.Config.LanguageItemTooltipDescription != GameLanguage.Off)
         {
