@@ -79,9 +79,9 @@ public class ConfigWindow : Window, IDisposable
         ImGui.TextColored(Miosuke.UI.ColourKhaki, "General");
         ImGui.Separator();
 
-        // Enabled
+        // Enable
         var Enabled = plugin.Config.Enabled;
-        if (ImGui.Checkbox($"Enabled{suffix}Enabled", ref Enabled))
+        if (ImGui.Checkbox($"Enable{suffix}Enable", ref Enabled))
         {
             plugin.ToggleEnabled(Enabled);
         }
@@ -95,7 +95,12 @@ public class ConfigWindow : Window, IDisposable
         var TemporaryEnableOnly = plugin.Config.TemporaryEnableOnly;
         if (ImGui.Checkbox($"but only upon hotkey{suffix}TemporaryEnableOnly", ref TemporaryEnableOnly))
         {
-            if (TemporaryEnableOnly) plugin.TooltipHandler.Reset();
+            if (TemporaryEnableOnly)
+            {
+                plugin.TooltipHandler.ResetItemTooltip();
+                plugin.TooltipHandler.ResetActionTooltip();
+            }
+
             plugin.Config.TemporaryEnableOnly = TemporaryEnableOnly;
             plugin.Config.Save();
         }
@@ -108,100 +113,61 @@ public class ConfigWindow : Window, IDisposable
         }
 
         // ----------------- Language -----------------
-        DrawLanguageSelector(padding);
+        DrawLanguageConfig(padding);
 
-
-        // ----------------- Tooltips -----------------
-        DrawColourConfig(padding);
 
         // ----------------- UI -----------------
-        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
-        suffix = $"###{plugin.Name}[UI]";
-        ImGui.TextColored(Miosuke.UI.ColourKhaki, "UI");
-        ImGui.Separator();
+        DrawUiConfig(padding);
 
-
-        // EnableTheme
-        var EnableTheme = plugin.Config.EnableTheme;
-        if (ImGui.Checkbox($"Bundled theme{suffix}EnableTheme", ref EnableTheme))
-        {
-            plugin.Config.EnableTheme = EnableTheme;
-            plugin.Config.Save();
-        }
-        ImGuiComponents.HelpMarker(
-            "Enable: A bundled theme will apply to this plugin so that it can be more compact and compatible.\n" +
-            "Disable: Your own (default) dalamud theme will be used."
-        );
-
-        // OffsetItemNameOriginal
-        var OffsetItemNameOriginal = plugin.Config.OffsetItemNameOriginal;
-        ImGui.Text("Offset item name original");
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(120);
-        if (ImGui.InputFloat($"{suffix}OffsetItemNameOriginal", ref OffsetItemNameOriginal))
-        {
-            plugin.Config.OffsetItemNameOriginal = OffsetItemNameOriginal;
-            plugin.Config.Save();
-        }
-        ImGuiComponents.HelpMarker(
-            "The new Y position = Y.original + offset. Adjust this to fit your custom UI layout."
-        );
-
-        // OffsetItemNameTranslation
-        var OffsetItemNameTranslation = plugin.Config.OffsetItemNameTranslation;
-        ImGui.Text("Offset item name translation");
-        ImGui.SameLine();
-        ImGui.SetNextItemWidth(120);
-        if (ImGui.InputFloat($"{suffix}OffsetItemNameTranslation", ref OffsetItemNameTranslation))
-        {
-            plugin.Config.OffsetItemNameTranslation = OffsetItemNameTranslation;
-            plugin.Config.Save();
-        }
-        ImGuiComponents.HelpMarker(
-            "The new Y position = Y.original + offset. Adjust this to fit your custom UI layout."
-        );
     }
 
-    private void DrawLanguageSelector(float padding)
+    private void DrawLanguageConfig(float padding)
     {
-        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
+        // setup
+        float table_width = ImGui.GetWindowSize().X;
+        float table_height = ImGui.GetTextLineHeightWithSpacing() + ImGui.GetStyle().ItemSpacing.Y * 2;
+        float col_name_width = ImGui.CalcTextSize("　Action name translation　").X + 2 * ImGui.GetStyle().ItemSpacing.X;
+        float col_value_width = 150.0f;
+        float col_value_content_width = 120.0f;
         var suffix = $"###{plugin.Name}[Language]";
-        ImGui.TextColored(Miosuke.UI.ColourKhaki, "Language");
+        ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
+        ImGui.TextColored(UI.ColourTitle, "Language");
         ImGui.Separator();
 
-        var table_width = ImGui.GetWindowSize().X;
-        var table_height = ImGui.GetTextLineHeightWithSpacing() * 4 + ImGui.GetStyle().ItemSpacing.Y * 8;
-        ImGui.BeginChild("table DrawLanguageSelector", new Vector2(table_width, table_height), false);
+        // TABLE Item tooltip
+        ImGui.TextColored(UI.ColourSubtitle, "Item tooltip");
+        ImGuiComponents.HelpMarker(
+            "The language you want to display additionally on item tooltips."
+        );
+
+        ImGui.BeginChild("table DrawLanguageConfig Item tooltip", new Vector2(table_width, table_height * 2), false);
         ImGui.Columns(2);
-        ImGui.SetColumnWidth(0, ImGui.CalcTextSize("Action Tooltip Description xx").X + 2 * ImGui.GetStyle().ItemSpacing.X);
-        ImGui.SetColumnWidth(1, 150.0f);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
 
-        ImGui.Text("Item tooltip name");
+        // LanguageItemTooltipName
+        ImGui.TextColored(UI.ColourText, "　Name");
         ImGui.NextColumn();
-
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.BeginCombo($"{suffix}LanguageItemTooltipName", plugin.Config.LanguageItemTooltipName.ToString()))
         {
             foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
             {
                 if (ImGui.Selectable(type.ToString(), type == plugin.Config.LanguageItemTooltipName))
                 {
-                    if (type == GameLanguage.Off) plugin.TooltipHandler.Reset();
+                    if (type == GameLanguage.Off) plugin.TooltipHandler.ResetItemTooltip();
                     plugin.Config.LanguageItemTooltipName = type;
                     plugin.Config.Save();
                 }
             }
             ImGui.EndCombo();
         }
-        ImGuiComponents.HelpMarker(
-            "The language you want to display additionally for item name."
-        );
         ImGui.NextColumn();
 
-        ImGui.Text("Item tooltip description");
+        // LanguageItemTooltipDescription
+        ImGui.TextColored(UI.ColourText, "　Description");
         ImGui.NextColumn();
-
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.BeginCombo($"{suffix}LanguageItemTooltipDescription", plugin.Config.LanguageItemTooltipDescription.ToString()))
         {
             foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
@@ -214,36 +180,47 @@ public class ConfigWindow : Window, IDisposable
             }
             ImGui.EndCombo();
         }
+        ImGui.NextColumn();
+
+        ImGui.Columns(1);
+        ImGui.EndChild();
+
+
+        // TABLE Action tooltip
+        ImGui.TextColored(UI.ColourSubtitle, "Action tooltip");
         ImGuiComponents.HelpMarker(
-            "The language you want to display additionally for item description."
+            "The language you want to display additionally on actions, traits (passive skills) and general actions (sprint, etc.).\n" +
+            "Note that translations are raw text extracted from the game, so if you see any weird/missing text, it's because of the original text contains expressions that are not currently supported by this plugin."
         );
-        ImGui.NextColumn();
 
-        ImGui.Text("Action tooltip name");
-        ImGui.NextColumn();
+        ImGui.BeginChild("table DrawLanguageConfig Action tooltip", new Vector2(table_width, table_height * 2), false);
+        ImGui.Columns(2);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
 
-        ImGui.SetNextItemWidth(120);
+        // LanguageActionTooltipName
+        ImGui.TextColored(UI.ColourText, "　Name");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.BeginCombo($"{suffix}LanguageActionTooltipName", plugin.Config.LanguageActionTooltipName.ToString()))
         {
             foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
             {
                 if (ImGui.Selectable(type.ToString(), type == plugin.Config.LanguageActionTooltipName))
                 {
+                    if (type == GameLanguage.Off) plugin.TooltipHandler.ResetActionTooltip();
                     plugin.Config.LanguageActionTooltipName = type;
                     plugin.Config.Save();
                 }
             }
             ImGui.EndCombo();
         }
-        ImGuiComponents.HelpMarker(
-            "(WIP) The language you want to display additionally for action name."
-        );
         ImGui.NextColumn();
 
-        ImGui.Text("Action tooltip description");
+        // LanguageActionTooltipDescription
+        ImGui.TextColored(UI.ColourText, "　Description");
         ImGui.NextColumn();
-
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.BeginCombo($"{suffix}LanguageActionTooltipDescription", plugin.Config.LanguageActionTooltipDescription.ToString()))
         {
             foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
@@ -256,96 +233,171 @@ public class ConfigWindow : Window, IDisposable
             }
             ImGui.EndCombo();
         }
-        ImGuiComponents.HelpMarker(
-            "(WIP) The language you want to display additionally for action description."
-        );
         ImGui.NextColumn();
 
         ImGui.Columns(1);
         ImGui.EndChild();
-
     }
 
-    private void DrawColourConfig(float padding)
+
+    private void DrawUiConfig(float padding)
     {
+        // setup
+        float table_width = ImGui.GetWindowSize().X;
+        float table_height = ImGui.GetTextLineHeightWithSpacing() + ImGui.GetStyle().ItemSpacing.Y * 2;
+        float col_name_width = ImGui.CalcTextSize("　Action name translation　").X + 2 * ImGui.GetStyle().ItemSpacing.X;
+        float col_value_width = 150.0f;
+        float col_value_content_width = 120.0f;
+        var suffix = $"###{plugin.Name}[UI]";
         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
-        var suffix = $"###{plugin.Name}[TooltipColour]";
-        ImGui.TextColored(Miosuke.UI.ColourKhaki, "Tooltip Colour");
+        ImGui.TextColored(UI.ColourTitle, "UI");
         ImGui.Separator();
 
 
-        var table_width = ImGui.GetWindowSize().X;
-        var table_height = ImGui.GetTextLineHeightWithSpacing() * 4 + ImGui.GetStyle().ItemSpacing.Y * 8;
-        ImGui.BeginChild("table DrawColourConfig", new Vector2(table_width, table_height), false);
+        // EnableTheme
+        var EnableTheme = plugin.Config.EnableTheme;
+        if (ImGui.Checkbox($"Use bundled theme{suffix}EnableTheme", ref EnableTheme))
+        {
+            plugin.Config.EnableTheme = EnableTheme;
+            plugin.Config.Save();
+        }
+        ImGuiComponents.HelpMarker(
+            "Enable: Use a bundled theme (more compact and compatible) for this plugin.\n" +
+            "Disable: Use your current Dalamud theme."
+        );
+
+
+        // TABLE Translation Colour
+        ImGui.TextColored(UI.ColourSubtitle, "Translation colour");
+        ImGuiComponents.HelpMarker(
+            "Set custom colour code of the translated text.\n" +
+            "The colour code is a NUMBER, like 3 (default). You can find all colour codes in /xldata > UIColour > Row ID."
+        );
+
+        ImGui.BeginChild("table DrawUiConfig Translation colour", new Vector2(table_width, table_height * 4), false);
         ImGui.Columns(2);
-        ImGui.SetColumnWidth(0, ImGui.CalcTextSize("Action Tooltip Description xx").X + 2 * ImGui.GetStyle().ItemSpacing.X);
-        ImGui.SetColumnWidth(1, 150.0f);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
 
         // ItemNameColourKey
-        ImGui.Text("Item name");
+        ImGui.TextColored(UI.ColourText, "　Item name");
         ImGui.NextColumn();
         var ItemNameColourKey = (int)plugin.Config.ItemNameColourKey;
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.InputInt($"{suffix}ItemNameColourKey", ref ItemNameColourKey))
         {
             plugin.Config.ItemNameColourKey = (ushort)ItemNameColourKey;
             plugin.Config.Save();
         }
-        ImGuiComponents.HelpMarker(
-            "This is the colour CODE of the translated item name in the tooltip. It's a number, like 3.\n" +
-            "You can find the colour code in /xldata -> UIColour -> Row ID."
-            );
         ImGui.NextColumn();
 
         // ItemDescriptionColourKey
-        ImGui.Text("Item description");
+        ImGui.TextColored(UI.ColourText, "　Item description");
         ImGui.NextColumn();
         var ItemDescriptionColourKey = (int)plugin.Config.ItemDescriptionColourKey;
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.InputInt($"{suffix}ItemDescriptionColourKey", ref ItemDescriptionColourKey))
         {
             plugin.Config.ItemDescriptionColourKey = (ushort)ItemDescriptionColourKey;
             plugin.Config.Save();
         }
-        ImGuiComponents.HelpMarker(
-            "Same as above, but for the item description."
-            );
         ImGui.NextColumn();
 
 
         // ActionNameColourKey
-        ImGui.Text("(WIP)Action name");
+        ImGui.TextColored(UI.ColourText, "　Action name");
         ImGui.NextColumn();
         var ActionNameColourKey = (int)plugin.Config.ActionNameColourKey;
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.InputInt($"{suffix}ActionNameColourKey", ref ActionNameColourKey))
         {
             plugin.Config.ActionNameColourKey = (ushort)ActionNameColourKey;
             plugin.Config.Save();
         }
-        ImGuiComponents.HelpMarker(
-            "Same as above, but for the action name."
-            );
         ImGui.NextColumn();
 
         // ActionDescriptionColourKey
-        ImGui.Text("(WIP)Action description");
+        ImGui.TextColored(UI.ColourText, "　Action description");
         ImGui.NextColumn();
         var ActionDescriptionColourKey = (int)plugin.Config.ActionDescriptionColourKey;
-        ImGui.SetNextItemWidth(120);
+        ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.InputInt($"{suffix}ActionDescriptionColourKey", ref ActionDescriptionColourKey))
         {
             plugin.Config.ActionDescriptionColourKey = (ushort)ActionDescriptionColourKey;
             plugin.Config.Save();
         }
-        ImGuiComponents.HelpMarker(
-            "Same as above, but for the action description."
-            );
         ImGui.NextColumn();
 
         ImGui.Columns(1);
         ImGui.EndChild();
 
+
+
+        ImGui.TextColored(UI.ColourSubtitle, "Y offset");
+        ImGuiComponents.HelpMarker(
+            "Try a different offset to fit your favourite UI layout.\n" +
+            "The updated position Y' = Y_original + offset.\n"
+        );
+
+        ImGui.BeginChild("table DrawUiConfig Y offset", new Vector2(table_width, table_height * 4), false);
+        ImGui.Columns(2);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
+
+        // OffsetItemNameOriginal
+        var OffsetItemNameOriginal = plugin.Config.OffsetItemNameOriginal;
+        ImGui.TextColored(UI.ColourText, "　Item name");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputFloat($"{suffix}OffsetItemNameOriginal", ref OffsetItemNameOriginal))
+        {
+            plugin.Config.OffsetItemNameOriginal = OffsetItemNameOriginal;
+            plugin.Config.Save();
+        }
+        ImGuiComponents.HelpMarker("Default: 4.5");
+        ImGui.NextColumn();
+
+        // OffsetItemNameTranslation
+        var OffsetItemNameTranslation = plugin.Config.OffsetItemNameTranslation;
+        ImGui.TextColored(UI.ColourText, "　Item name translation");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputFloat($"{suffix}OffsetItemNameTranslation", ref OffsetItemNameTranslation))
+        {
+            plugin.Config.OffsetItemNameTranslation = OffsetItemNameTranslation;
+            plugin.Config.Save();
+        }
+        ImGuiComponents.HelpMarker("Default: 2.0");
+        ImGui.NextColumn();
+
+        // OffsetActionNameOriginal
+        var OffsetActionNameOriginal = plugin.Config.OffsetActionNameOriginal;
+        ImGui.TextColored(UI.ColourText, "　Action name");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputFloat($"{suffix}OffsetActionNameOriginal", ref OffsetActionNameOriginal))
+        {
+            plugin.Config.OffsetActionNameOriginal = OffsetActionNameOriginal;
+            plugin.Config.Save();
+        }
+        ImGuiComponents.HelpMarker("Default: -1.0");
+        ImGui.NextColumn();
+
+        // OffsetActionNameTranslation
+        var OffsetActionNameTranslation = plugin.Config.OffsetActionNameTranslation;
+        ImGui.TextColored(UI.ColourText, "　Action name translation");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputFloat($"{suffix}OffsetActionNameTranslation", ref OffsetActionNameTranslation))
+        {
+            plugin.Config.OffsetActionNameTranslation = OffsetActionNameTranslation;
+            plugin.Config.Save();
+        }
+        ImGuiComponents.HelpMarker("Default: -8.5");
+        ImGui.NextColumn();
+
+        ImGui.Columns(1);
+        ImGui.EndChild();
     }
 
 }

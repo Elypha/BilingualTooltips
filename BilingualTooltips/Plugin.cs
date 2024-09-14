@@ -150,13 +150,21 @@ public sealed partial class Plugin : IDalamudPlugin
     {
         if (target == null)
         {
-            if (Config.Enabled) TooltipHandler.Reset();
+            if (Config.Enabled)
+            {
+                TooltipHandler.ResetItemTooltip();
+                TooltipHandler.ResetActionTooltip();
+            }
             Config.Enabled = !Config.Enabled;
         }
         else
         {
             if (Config.Enabled == (bool)target) return;
-            if (Config.Enabled && !(bool)target) TooltipHandler.Reset();
+            if (Config.Enabled && !(bool)target)
+            {
+                TooltipHandler.ResetItemTooltip();
+                TooltipHandler.ResetActionTooltip();
+            }
             Config.Enabled = (bool)target;
         }
         Config.Save();

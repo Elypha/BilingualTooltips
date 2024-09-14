@@ -26,8 +26,10 @@ public class BilingualTooltipsConfig : IPluginConfiguration
     public ushort ActionNameColourKey { get; set; } = 3;
     public ushort ActionDescriptionColourKey { get; set; } = 3;
     public bool EnableTheme { get; set; } = false;
-    public float OffsetItemNameOriginal { get; set; } = 6;
-    public float OffsetItemNameTranslation { get; set; } = -2.5f;
+    public float OffsetItemNameOriginal { get; set; } = 4.5f;
+    public float OffsetItemNameTranslation { get; set; } = 2.0f;
+    public float OffsetActionNameOriginal { get; set; } = -1.0f;
+    public float OffsetActionNameTranslation { get; set; } = -8.5f;
     public List<string> RegexList { get; set; } = new List<string>();
 
 
