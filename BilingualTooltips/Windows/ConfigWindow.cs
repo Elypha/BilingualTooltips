@@ -336,7 +336,7 @@ public class ConfigWindow : Window, IDisposable
         ImGui.TextColored(UI.ColourSubtitle, "Y offset");
         ImGuiComponents.HelpMarker(
             "Try a different offset to fit your favourite UI layout.\n" +
-            "The updated position Y' = Y_original + offset.\n"
+            "The updated position Y' = Y + offset.\n"
         );
 
         ImGui.BeginChild("table DrawUiConfig Y offset", new Vector2(table_width, table_height * 4), false);

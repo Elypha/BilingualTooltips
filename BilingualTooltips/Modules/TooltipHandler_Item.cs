@@ -102,12 +102,12 @@ public partial class TooltipHandler
     {
         if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
         if (!plugin.Config.Enabled) return;
-        if (plugin.Config.TemporaryEnableOnly && !Hotkey.IsActive(plugin.Config.TemporaryEnableHotkey)) return;
 
         var addon = (AtkUnitBase*)args.Addon;
         if (!addon->IsVisible) return;
 
         if (plugin.Config.LanguageItemTooltipName != GameLanguage.Off) ResetItemTooltip();
+        if (plugin.Config.TemporaryEnableOnly && !Hotkey.IsActive(plugin.Config.TemporaryEnableHotkey)) return;
 
         var numberArrayData = ((NumberArrayData**)requestedUpdateArgs.NumberArrayData)[29];
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[26];
