@@ -9,6 +9,7 @@ using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using Lumina.Excel;
+using Miosuke.Action;
 using Miosuke;
 using Dalamud.Game.Gui;
 using System.Collections.Generic;
@@ -41,6 +42,8 @@ public partial class TooltipHandler
     public ExcelSheet<GeneralAction> SheetGeneralActionDe = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.German)!;
     public ExcelSheet<GeneralAction> SheetGeneralActionFr = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.French)!;
 
+    public ExcelSheet<Action> SheetAction;
+
     public const int NewActionNameNodeId = 1270;
     public const int ActionDescriptionNodeId = 19;
     public string actionNameTranslation = "";
@@ -53,22 +56,24 @@ public partial class TooltipHandler
         if (hover.ActionID == 0) return;
 
         var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.GameData?.Abbreviation.ToString();
+        // var actionName = "";
+        // var actionDescription = "";
 
         if (hover.ActionKind == HoverActionKind.Action)
         {
             switch (plugin.Config.LanguageActionTooltipName)
             {
                 case GameLanguage.Japanese:
-                    actionNameTranslation = SheetActionJp.GetRow(hover.ActionID)?.Name ?? "Not found";
+                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
                     break;
                 case GameLanguage.English:
-                    actionNameTranslation = SheetActionEn.GetRow(hover.ActionID)?.Name ?? "Not found";
+                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
                     break;
                 case GameLanguage.German:
-                    actionNameTranslation = SheetActionDe.GetRow(hover.ActionID)?.Name ?? "Not found";
+                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
                     break;
                 case GameLanguage.French:
-                    actionNameTranslation = SheetActionFr.GetRow(hover.ActionID)?.Name ?? "Not found";
+                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
                     break;
             }
             switch (plugin.Config.LanguageActionTooltipDescription)
@@ -153,12 +158,17 @@ public partial class TooltipHandler
                     break;
             }
         }
+        else if ((uint)hover.ActionKind == 34 || (uint)hover.ActionKind == 39)
+        {
+            // 34 for minions, 39 for mounts
+            actionNameTranslation = "";
+            actionDescriptionTranslation = "";
+        }
         else
         {
-            Service.PluginLog.Debug($"Unsupported action kind for {hover.ActionID} [{hover.ActionKind}]");
+            Service.Log.Debug($"Unsupported action kind for {hover.ActionID} [{hover.ActionKind}]");
         }
 
-        // Service.PluginLog.Info($"Hover action {actionNameTranslation} Desc {actionDescriptionTranslation} ActionKind {hover.ActionKind} ActionID {hover.ActionID} BaseActionID {hover.BaseActionID}) mnemonic {mnemonic}");
 
     }
 
@@ -211,7 +221,7 @@ public partial class TooltipHandler
         // {
         //     var addr = new nint(stringArrayData->StringArray[i]);
         //     var seString = MemoryHelper.ReadSeStringNullTerminated(addr);
-        //     Service.PluginLog.Info($"{addon->NameString} str{i}: {seString.ToJson()}");
+        //     Service.Log.Info($"{addon->NameString} str{i}: {seString.ToJson()}");
         // }
         // LUT
         // 0: action name

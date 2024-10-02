@@ -6,6 +6,7 @@ using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Interface.Utility;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
+using Miosuke.Action;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.GeneratedSheets;
 using Lumina.Excel;
