@@ -7,7 +7,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Lumina.Excel;
 using Miosuke.Action;
 using Miosuke;
@@ -21,15 +21,13 @@ namespace BilingualTooltips;
 
 public partial class TooltipHandler
 {
-    public ExcelSheet<Lumina.Excel.GeneratedSheets.Action> SheetNameAction = Service.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<Lumina.Excel.Sheets.Action> SheetNameAction = Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(Dalamud.Game.ClientLanguage.Japanese)!;
     public ExcelSheet<GeneralAction> SheetNameGeneralAction = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.Japanese)!;
     public ExcelSheet<Trait> SheetNameTrait = Service.Data.GetExcelSheet<Trait>(Dalamud.Game.ClientLanguage.Japanese)!;
     public ExcelSheet<ActionTransient> SheetDescActionTransient = Service.Data.GetExcelSheet<ActionTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
     public ExcelSheet<GeneralAction> SheetDescGeneralAction = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.Japanese)!;
     public ExcelSheet<TraitTransient> SheetDescTraitTransient = Service.Data.GetExcelSheet<TraitTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
 
-    public const int NewActionNameNodeId = 1270;
-    public const int ActionDescriptionNodeId = 19;
     public string actionNameTranslation = "";
     public string actionDescriptionTranslation = "";
 
@@ -39,26 +37,26 @@ public partial class TooltipHandler
         var hover = Service.GameGui.HoveredAction;
         if (hover.ActionID == 0) return false;
 
-        var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.GameData?.Abbreviation.ToString();
+        var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.Value.Abbreviation.ToString();
         // var actionName = "";
         // var actionDescription = "";
 
         if (hover.ActionKind == HoverActionKind.Action)
         {
-            actionNameTranslation = SheetNameAction.GetRow(hover.ActionID)?.Name ?? "Not found";
-            actionDescriptionTranslation = SheetDescActionTransient.GetRow(hover.ActionID)?.Description ?? "Not found";
+            actionNameTranslation = SheetNameAction.GetRow(hover.ActionID).Name.ExtractText();
+            actionDescriptionTranslation = SheetDescActionTransient.GetRow(hover.ActionID).Description.ExtractText();
             return true;
         }
         else if (hover.ActionKind == HoverActionKind.GeneralAction)
         {
-            actionNameTranslation = SheetNameGeneralAction.GetRow(hover.ActionID)?.Name ?? "Not found";
-            actionDescriptionTranslation = SheetDescGeneralAction.GetRow(hover.ActionID)?.Description ?? "Not found";
+            actionNameTranslation = SheetNameGeneralAction.GetRow(hover.ActionID).Name.ExtractText();
+            actionDescriptionTranslation = SheetDescGeneralAction.GetRow(hover.ActionID).Description.ExtractText();
             return true;
         }
         else if (hover.ActionKind == HoverActionKind.Trait)
         {
-            actionNameTranslation = SheetNameTrait.GetRow(hover.ActionID)?.Name ?? "Not found";
-            actionDescriptionTranslation = SheetDescTraitTransient.GetRow(hover.ActionID)?.Description ?? "Not found";
+            actionNameTranslation = SheetNameTrait.GetRow(hover.ActionID).Name.ExtractText();
+            actionDescriptionTranslation = SheetDescTraitTransient.GetRow(hover.ActionID).Description.ExtractText();
             return true;
         }
         else if ((uint)hover.ActionKind == 34 || (uint)hover.ActionKind == 39)
@@ -88,7 +86,7 @@ public partial class TooltipHandler
         var addonPtr = (AtkUnitBase*)addon;
 
         // remove translation if it exists
-        var customNode = GetNodeByNodeId(addonPtr, NewActionNameNodeId);
+        var customNode = GetNodeByNodeId(addonPtr, (int)ActionDescriptionNode.NameTranslated);
         if (customNode != null)
         {
             if (customNode->AtkResNode.IsVisible())
@@ -100,7 +98,7 @@ public partial class TooltipHandler
         }
 
         // reset original item name position
-        var name_node = addonPtr->GetTextNodeById(5);
+        var name_node = addonPtr->GetTextNodeById((uint)ActionDescriptionNode.Name);
         float x, y;
         name_node->GetPositionFloat(&x, &y);
         name_node->SetPositionFloat(x, 14);
@@ -146,13 +144,13 @@ public partial class TooltipHandler
 
     private unsafe void AddActionNameTranslation(AtkUnitBase* addon)
     {
-        var textNode = GetNodeByNodeId(addon, NewActionNameNodeId);
+        var textNode = GetNodeByNodeId(addon, (int)ActionDescriptionNode.NameTranslated);
         if (textNode != null) textNode->AtkResNode.ToggleVisibility(false);
 
         var insertNode = addon->GetNodeById(2);
         if (insertNode == null) return;
 
-        var baseTextNode = addon->GetTextNodeById(5);
+        var baseTextNode = addon->GetTextNodeById((uint)ActionDescriptionNode.Name);
         if (baseTextNode == null) return;
 
         if (textNode == null)
@@ -160,7 +158,7 @@ public partial class TooltipHandler
             textNode = IMemorySpace.GetUISpace()->Create<AtkTextNode>();
             if (textNode == null) return;
             textNode->AtkResNode.Type = NodeType.Text;
-            textNode->AtkResNode.NodeId = NewActionNameNodeId;
+            textNode->AtkResNode.NodeId = (int)ActionDescriptionNode.NameTranslated;
 
 
             textNode->AtkResNode.NodeFlags = NodeFlags.AnchorLeft | NodeFlags.AnchorTop;
@@ -209,9 +207,9 @@ public partial class TooltipHandler
         textNode->SetText(lines.Encode());
 
         textNode->ResizeNodeForCurrentText();
-        textNode->SetWidth(200);
+        textNode->SetWidth(300);
         textNode->SetHeight(21);
-        var itemNameNode = addon->GetTextNodeById(5);
+        var itemNameNode = addon->GetTextNodeById((uint)ActionDescriptionNode.Name);
         var textNodeOffset = plugin.Config.OffsetActionNameTranslation;
         textNode->AtkResNode.SetPositionFloat(itemNameNode->AtkResNode.X, itemNameNode->AtkResNode.Y + textNodeOffset);
 
@@ -223,7 +221,7 @@ public partial class TooltipHandler
 
     private unsafe void AddActionDescriptionTranslation(AtkUnitBase* addon, StringArrayData* stringArrayData)
     {
-        var descriptionNode = addon->GetTextNodeById(ActionDescriptionNodeId);
+        var descriptionNode = addon->GetTextNodeById((uint)ActionDescriptionNode.Description);
         if (descriptionNode == null) return;
 
         var insertNode = addon->GetNodeById(2);

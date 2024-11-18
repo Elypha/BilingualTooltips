@@ -8,7 +8,7 @@ using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using Miosuke.Action;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Lumina.Excel;
 using Miosuke;
 using Dalamud.Game.Gui;
@@ -21,11 +21,9 @@ namespace BilingualTooltips;
 
 public partial class TooltipHandler
 {
-    public ExcelSheet<Item> SheetNameItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<Item> SheetDescItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<Item> SheetNameItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese);
+    public ExcelSheet<Item> SheetDescItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese);
 
-    public const int ItemNameTranslationNodeId = 1270;
-    public const int ItemDescriptionNodeId = 41;
     public string itemNameTranslation = "";
     public string itemDescriptionTranslation = "";
     public bool isShowItemGlamName = true;
@@ -40,8 +38,8 @@ public partial class TooltipHandler
             itemId %= 500000;
         }
 
-        itemNameTranslation = SheetNameItem.GetRow((uint)itemId)?.Name ?? "Not found";
-        itemDescriptionTranslation = SheetDescItem.GetRow((uint)itemId)?.Description ?? "Not found";
+        itemNameTranslation = SheetNameItem.GetRow((uint)itemId).Name.ExtractText();
+        itemDescriptionTranslation = SheetDescItem.GetRow((uint)itemId).Description.ExtractText();
     }
 
 
@@ -51,7 +49,7 @@ public partial class TooltipHandler
         var addonPtr = (AtkUnitBase*)addon;
 
         // remove translation if it exists
-        var nameTranslationNode = GetNodeByNodeId(addonPtr, ItemNameTranslationNodeId);
+        var nameTranslationNode = GetNodeByNodeId(addonPtr, (int)ItemDetailTextNode.NameTranslated);
         if (nameTranslationNode != null)
         {
             if (nameTranslationNode->AtkResNode.IsVisible())
@@ -63,7 +61,7 @@ public partial class TooltipHandler
         }
 
         // reset original item name position
-        var name_node = addonPtr->GetTextNodeById(32);
+        var name_node = addonPtr->GetTextNodeById((uint)ItemDetailTextNode.Name);
         float x, y;
         name_node->GetPositionFloat(&x, &y);
         name_node->SetPositionFloat(x, 14);
@@ -112,13 +110,13 @@ public partial class TooltipHandler
 
     private unsafe void AddItemNameTranslation(AtkUnitBase* addon)
     {
-        var textNode = GetNodeByNodeId(addon, ItemNameTranslationNodeId);
+        var textNode = GetNodeByNodeId(addon, (int)ItemDetailTextNode.NameTranslated);
         if (textNode != null) textNode->AtkResNode.ToggleVisibility(false);
 
         var insertNode = addon->GetNodeById(2);
         if (insertNode == null) return;
 
-        var baseTextNode = addon->GetTextNodeById(43);
+        var baseTextNode = addon->GetTextNodeById((uint)ItemDetailTextNode.Name);
         if (baseTextNode == null) return;
 
         if (textNode == null)
@@ -126,7 +124,7 @@ public partial class TooltipHandler
             textNode = IMemorySpace.GetUISpace()->Create<AtkTextNode>();
             if (textNode == null) return;
             textNode->AtkResNode.Type = NodeType.Text;
-            textNode->AtkResNode.NodeId = ItemNameTranslationNodeId;
+            textNode->AtkResNode.NodeId = (int)ItemDetailTextNode.NameTranslated;
 
 
             textNode->AtkResNode.NodeFlags = NodeFlags.AnchorLeft | NodeFlags.AnchorTop;
@@ -175,9 +173,9 @@ public partial class TooltipHandler
         textNode->SetText(lines.Encode());
 
         textNode->ResizeNodeForCurrentText();
-        textNode->SetWidth(200);
+        textNode->SetWidth(300);
         textNode->SetHeight(21);
-        var itemNameNode = addon->GetTextNodeById(32);
+        var itemNameNode = addon->GetTextNodeById((uint)ItemDetailTextNode.Name);
         var textNodeOffset = plugin.Config.OffsetItemNameTranslation;
         textNode->AtkResNode.SetPositionFloat(itemNameNode->AtkResNode.X, itemNameNode->AtkResNode.Y + textNodeOffset);
         var itemNameOffset = plugin.Config.OffsetItemNameOriginal;
@@ -187,7 +185,7 @@ public partial class TooltipHandler
 
     private unsafe void AddItemDescriptionTranslation(AtkUnitBase* addon, StringArrayData* stringArrayData)
     {
-        var itemDescriptionNode = addon->GetTextNodeById(ItemDescriptionNodeId);
+        var itemDescriptionNode = addon->GetTextNodeById((uint)ItemDetailTextNode.Description);
         if (itemDescriptionNode == null) return;
 
         var insertNode = addon->GetNodeById(2);

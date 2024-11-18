@@ -8,7 +8,7 @@ using Dalamud.Interface.Style;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using Dalamud.Plugin;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Lumina.Excel;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;

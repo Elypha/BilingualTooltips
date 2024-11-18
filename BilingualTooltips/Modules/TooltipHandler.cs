@@ -7,7 +7,7 @@ using Dalamud.Interface.Utility;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Lumina.Excel;
 using Miosuke;
 using Dalamud.Game.Gui;
@@ -33,6 +33,20 @@ public partial class TooltipHandler
     {
         ResetItemTooltip();
         ResetActionTooltip();
+    }
+
+    public enum ItemDetailTextNode
+    {
+        Name = 33,
+        Description = 42,
+        NameTranslated = 1270,
+    }
+
+    public enum ActionDescriptionNode
+    {
+        Name = 5,
+        Description = 19,
+        NameTranslated = 1270,
     }
 
 
@@ -83,11 +97,11 @@ public partial class TooltipHandler
     {
         plugin.TooltipHandler.SheetNameAction = lang switch
         {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>(ClientLanguage.Japanese)!,
+            GameLanguage.Japanese => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.Japanese)!,
+            GameLanguage.English => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.English)!,
+            GameLanguage.German => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.German)!,
+            GameLanguage.French => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.French)!,
+            _ => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.Japanese)!,
         };
         plugin.TooltipHandler.SheetNameGeneralAction = lang switch
         {

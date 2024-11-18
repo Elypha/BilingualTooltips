@@ -3,7 +3,7 @@ using Dalamud.Game.Text;
 using Dalamud.Interface.Components;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using System.Collections.Generic;
 using System.Linq;
 using Dalamud.Game;

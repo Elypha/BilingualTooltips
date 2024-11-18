@@ -9,7 +9,7 @@ using Dalamud.Interface.Style;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
 using Dalamud.Plugin;
-using Lumina.Excel.GeneratedSheets;
+using Lumina.Excel.Sheets;
 using Dalamud.Game.Addon.Lifecycle;
 using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
 using Dalamud.Game.Text.SeStringHandling.Payloads;
