@@ -22,11 +22,10 @@ using System.Numerics;
 using System;
 
 
-namespace BilingualTooltips;
+namespace BilingualTooltips.Windows;
 
 public class MainWindow : Window, IDisposable
 {
-    // private IDalamudTextureWrap goatImage;
     private BilingualTooltipsPlugin plugin;
 
     public MainWindow(BilingualTooltipsPlugin plugin) : base(

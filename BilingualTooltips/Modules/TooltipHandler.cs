@@ -17,7 +17,7 @@ using System.Text.RegularExpressions;
 using Dalamud.Game;
 
 
-namespace BilingualTooltips;
+namespace BilingualTooltips.Modules;
 
 public partial class TooltipHandler
 {

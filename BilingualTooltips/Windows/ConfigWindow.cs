@@ -14,7 +14,7 @@ using System;
 using Miosuke.Configuration;
 
 
-namespace BilingualTooltips;
+namespace BilingualTooltips.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {

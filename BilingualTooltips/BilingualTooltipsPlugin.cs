@@ -26,6 +26,8 @@ using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using BilingualTooltips.Configuration;
 using BilingualTooltips.Assets;
+using BilingualTooltips.Windows;
+using BilingualTooltips.Modules;
 
 
 namespace BilingualTooltips;
@@ -48,6 +50,7 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
     // WINDOWS
     public ConfigWindow ConfigWindow { get; init; }
     public MainWindow MainWindow { get; init; }
+    public ItemTooltipPanel itemTooltipPanel { get; init; }
     public WindowSystem WindowSystem = new("BilingualTooltips");
 
 
@@ -101,8 +104,10 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
 
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
+        itemTooltipPanel = new ItemTooltipPanel(this);
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
+        WindowSystem.AddWindow(itemTooltipPanel);
 
 
         // HANDLERS
@@ -127,6 +132,7 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         // unload windows
         ConfigWindow.Dispose();
         MainWindow.Dispose();
+        itemTooltipPanel.Dispose();
 
         // unload event handlers
         Service.PluginInterface.UiBuilder.Draw -= DrawUI;

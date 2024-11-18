@@ -17,7 +17,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 
-namespace BilingualTooltips;
+namespace BilingualTooltips.Modules;
 
 public partial class TooltipHandler
 {

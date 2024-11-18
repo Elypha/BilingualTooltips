@@ -17,7 +17,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 
 
-namespace BilingualTooltips;
+namespace BilingualTooltips.Modules;
 
 public partial class TooltipHandler
 {
@@ -40,6 +40,18 @@ public partial class TooltipHandler
 
         itemNameTranslation = SheetNameItem.GetRow((uint)itemId).Name.ExtractText();
         itemDescriptionTranslation = SheetDescItem.GetRow((uint)itemId).Description.ExtractText();
+    }
+
+    private void SetupItemTooltipPanel()
+    {
+        // if (!Hotkey.IsActive(plugin.Config.ItemTooltipPanelHotkey)) return;
+
+        // P.itemTooltipPanel.translations.Clear();
+
+        // if (P.Config.ItemTooltipPanelText1 != GameLanguage.Off)
+        // {
+        //     P.itemTooltipPanel.translations.Add($"{P.Config.ItemTooltipPanelText1}: {itemNameTranslation}");
+        // }
     }
 
 
@@ -82,6 +94,8 @@ public partial class TooltipHandler
         var numberArrayData = ((NumberArrayData**)requestedUpdateArgs.NumberArrayData)[29];
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[26];
         UpdateItemTooltipData();
+
+        SetupItemTooltipPanel();
 
         if (plugin.Config.LanguageItemTooltipDescription != GameLanguage.Off)
         {
