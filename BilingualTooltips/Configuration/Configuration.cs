@@ -4,46 +4,37 @@ using Dalamud.Game.Text;
 using Dalamud.Plugin;
 using System.Collections.Generic;
 using System;
+using System.Numerics;
+using Miosuke.Configuration;
 
 
-namespace BilingualTooltips;
+namespace BilingualTooltips.Configuration;
 
 [Serializable]
-public class BilingualTooltipsConfig : IPluginConfiguration
+public class BilingualTooltipsConfig : IMioConfig
 {
-    public int Version { get; set; } = 0;
+    public int Version = 0;
 
     // ----------------- General -----------------
-    public bool Enabled { get; set; } = true;
-    public bool TemporaryEnableOnly { get; set; } = false;
-    public VirtualKey[] TemporaryEnableHotkey { get; set; } = [VirtualKey.CONTROL, VirtualKey.X];
-    public GameLanguage LanguageItemTooltipName { get; set; } = GameLanguage.Japanese;
-    public GameLanguage LanguageItemTooltipDescription { get; set; } = GameLanguage.Japanese;
-    public GameLanguage LanguageActionTooltipName { get; set; } = GameLanguage.Japanese;
-    public GameLanguage LanguageActionTooltipDescription { get; set; } = GameLanguage.Japanese;
-    public ushort ItemNameColourKey { get; set; } = 3;
-    public ushort ItemDescriptionColourKey { get; set; } = 3;
-    public ushort ActionNameColourKey { get; set; } = 3;
-    public ushort ActionDescriptionColourKey { get; set; } = 3;
-    public bool EnableTheme { get; set; } = false;
-    public float OffsetItemNameOriginal { get; set; } = 4.5f;
-    public float OffsetItemNameTranslation { get; set; } = 2.0f;
-    public float OffsetActionNameOriginal { get; set; } = -1.0f;
-    public float OffsetActionNameTranslation { get; set; } = -8.5f;
-    public List<string> RegexList { get; set; } = new List<string>();
+    public bool Enabled = true;
+    public bool TemporaryEnableOnly = false;
+    public VirtualKey[] TemporaryEnableHotkey = [VirtualKey.CONTROL, VirtualKey.X];
+    public GameLanguage LanguageItemTooltipName = GameLanguage.Japanese;
+    public GameLanguage LanguageItemTooltipDescription = GameLanguage.Japanese;
+    public GameLanguage LanguageActionTooltipName = GameLanguage.Japanese;
+    public GameLanguage LanguageActionTooltipDescription = GameLanguage.Japanese;
+    public ushort ItemNameColourKey = 3;
+    public ushort ItemDescriptionColourKey = 3;
+    public ushort ActionNameColourKey = 3;
+    public ushort ActionDescriptionColourKey = 3;
+    public bool EnableTheme = false;
+    public float OffsetItemNameOriginal = 4.5f;
+    public float OffsetItemNameTranslation = 2.0f;
+    public float OffsetActionNameOriginal = -1.0f;
+    public float OffsetActionNameTranslation = -8.5f;
+    public Vector2 OffsetGlamName = new Vector2(0.0f, 0.0f);
+    public float GlamNameFontSize = 16.0f;
+    public List<string> RegexList = [];
 
-
-    // the below exist just to make saving less cumbersome
-    [NonSerialized]
-    private IDalamudPluginInterface? pluginInterface;
-
-    public void Initialize(IDalamudPluginInterface pluginInterface)
-    {
-        this.pluginInterface = pluginInterface;
-    }
-
-    public void Save()
-    {
-        this.pluginInterface!.SavePluginConfig(this);
-    }
+    public string CustomTheme = "";
 }

@@ -21,15 +21,14 @@ namespace BilingualTooltips;
 
 public partial class TooltipHandler
 {
-    public ExcelSheet<Item> SheetItemJp = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<Item> SheetItemEn = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.English)!;
-    public ExcelSheet<Item> SheetItemDe = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.German)!;
-    public ExcelSheet<Item> SheetItemFr = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.French)!;
+    public ExcelSheet<Item> SheetNameItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<Item> SheetDescItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese)!;
 
-    public const int NewItemNameNodeId = 1270;
+    public const int ItemNameTranslationNodeId = 1270;
     public const int ItemDescriptionNodeId = 41;
     public string itemNameTranslation = "";
     public string itemDescriptionTranslation = "";
+    public bool isShowItemGlamName = true;
 
 
     private void UpdateItemTooltipData()
@@ -41,36 +40,8 @@ public partial class TooltipHandler
             itemId %= 500000;
         }
 
-        switch (plugin.Config.LanguageItemTooltipName)
-        {
-            case GameLanguage.Japanese:
-                itemNameTranslation = SheetItemJp.GetRow((uint)itemId)?.Name ?? "Not found";
-                break;
-            case GameLanguage.English:
-                itemNameTranslation = SheetItemEn.GetRow((uint)itemId)?.Name ?? "Not found";
-                break;
-            case GameLanguage.German:
-                itemNameTranslation = SheetItemDe.GetRow((uint)itemId)?.Name ?? "Not found";
-                break;
-            case GameLanguage.French:
-                itemNameTranslation = SheetItemFr.GetRow((uint)itemId)?.Name ?? "Not found";
-                break;
-        }
-        switch (plugin.Config.LanguageItemTooltipDescription)
-        {
-            case GameLanguage.Japanese:
-                itemDescriptionTranslation = SheetItemJp.GetRow((uint)itemId)?.Description ?? "Not found";
-                break;
-            case GameLanguage.English:
-                itemDescriptionTranslation = SheetItemEn.GetRow((uint)itemId)?.Description ?? "Not found";
-                break;
-            case GameLanguage.German:
-                itemDescriptionTranslation = SheetItemDe.GetRow((uint)itemId)?.Description ?? "Not found";
-                break;
-            case GameLanguage.French:
-                itemDescriptionTranslation = SheetItemFr.GetRow((uint)itemId)?.Description ?? "Not found";
-                break;
-        }
+        itemNameTranslation = SheetNameItem.GetRow((uint)itemId)?.Name ?? "Not found";
+        itemDescriptionTranslation = SheetDescItem.GetRow((uint)itemId)?.Description ?? "Not found";
     }
 
 
@@ -80,14 +51,14 @@ public partial class TooltipHandler
         var addonPtr = (AtkUnitBase*)addon;
 
         // remove translation if it exists
-        var customNode = GetNodeByNodeId(addonPtr, NewItemNameNodeId);
-        if (customNode != null)
+        var nameTranslationNode = GetNodeByNodeId(addonPtr, ItemNameTranslationNodeId);
+        if (nameTranslationNode != null)
         {
-            if (customNode->AtkResNode.IsVisible())
+            if (nameTranslationNode->AtkResNode.IsVisible())
             {
                 var insertNode = addonPtr->GetNodeById(2);
                 if (insertNode == null) return;
-                customNode->AtkResNode.ToggleVisibility(false);
+                nameTranslationNode->AtkResNode.ToggleVisibility(false);
             }
         }
 
@@ -130,6 +101,8 @@ public partial class TooltipHandler
         // 0: item name
         // 2: item category
         // 13: item description
+        // var normalName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[0]));
+        // var glamName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[1]));
 
         if (plugin.Config.LanguageItemTooltipName == GameLanguage.Off) return;
 
@@ -139,7 +112,7 @@ public partial class TooltipHandler
 
     private unsafe void AddItemNameTranslation(AtkUnitBase* addon)
     {
-        var textNode = GetNodeByNodeId(addon, NewItemNameNodeId);
+        var textNode = GetNodeByNodeId(addon, ItemNameTranslationNodeId);
         if (textNode != null) textNode->AtkResNode.ToggleVisibility(false);
 
         var insertNode = addon->GetNodeById(2);
@@ -153,7 +126,7 @@ public partial class TooltipHandler
             textNode = IMemorySpace.GetUISpace()->Create<AtkTextNode>();
             if (textNode == null) return;
             textNode->AtkResNode.Type = NodeType.Text;
-            textNode->AtkResNode.NodeId = NewItemNameNodeId;
+            textNode->AtkResNode.NodeId = ItemNameTranslationNodeId;
 
 
             textNode->AtkResNode.NodeFlags = NodeFlags.AnchorLeft | NodeFlags.AnchorTop;

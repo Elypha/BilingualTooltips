@@ -27,9 +27,9 @@ namespace BilingualTooltips;
 public class MainWindow : Window, IDisposable
 {
     // private IDalamudTextureWrap goatImage;
-    private Plugin plugin;
+    private BilingualTooltipsPlugin plugin;
 
-    public MainWindow(Plugin plugin) : base(
+    public MainWindow(BilingualTooltipsPlugin plugin) : base(
         "BilingualTooltips",
         ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {

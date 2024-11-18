@@ -21,28 +21,12 @@ namespace BilingualTooltips;
 
 public partial class TooltipHandler
 {
-    public ExcelSheet<Action> SheetActionJp = Service.Data.GetExcelSheet<Action>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<Action> SheetActionEn = Service.Data.GetExcelSheet<Action>(Dalamud.Game.ClientLanguage.English)!;
-    public ExcelSheet<Action> SheetActionDe = Service.Data.GetExcelSheet<Action>(Dalamud.Game.ClientLanguage.German)!;
-    public ExcelSheet<Action> SheetActionFr = Service.Data.GetExcelSheet<Action>(Dalamud.Game.ClientLanguage.French)!;
-    public ExcelSheet<ActionTransient> SheetActionTransientJp = Service.Data.GetExcelSheet<ActionTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<ActionTransient> SheetActionTransientEn = Service.Data.GetExcelSheet<ActionTransient>(Dalamud.Game.ClientLanguage.English)!;
-    public ExcelSheet<ActionTransient> SheetActionTransientDe = Service.Data.GetExcelSheet<ActionTransient>(Dalamud.Game.ClientLanguage.German)!;
-    public ExcelSheet<ActionTransient> SheetActionTransientFr = Service.Data.GetExcelSheet<ActionTransient>(Dalamud.Game.ClientLanguage.French)!;
-    public ExcelSheet<Trait> SheetTraitJp = Service.Data.GetExcelSheet<Trait>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<Trait> SheetTraitEn = Service.Data.GetExcelSheet<Trait>(Dalamud.Game.ClientLanguage.English)!;
-    public ExcelSheet<Trait> SheetTraitDe = Service.Data.GetExcelSheet<Trait>(Dalamud.Game.ClientLanguage.German)!;
-    public ExcelSheet<Trait> SheetTraitFr = Service.Data.GetExcelSheet<Trait>(Dalamud.Game.ClientLanguage.French)!;
-    public ExcelSheet<TraitTransient> SheetTraitTransientJp = Service.Data.GetExcelSheet<TraitTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<TraitTransient> SheetTraitTransientEn = Service.Data.GetExcelSheet<TraitTransient>(Dalamud.Game.ClientLanguage.English)!;
-    public ExcelSheet<TraitTransient> SheetTraitTransientDe = Service.Data.GetExcelSheet<TraitTransient>(Dalamud.Game.ClientLanguage.German)!;
-    public ExcelSheet<TraitTransient> SheetTraitTransientFr = Service.Data.GetExcelSheet<TraitTransient>(Dalamud.Game.ClientLanguage.French)!;
-    public ExcelSheet<GeneralAction> SheetGeneralActionJp = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<GeneralAction> SheetGeneralActionEn = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.English)!;
-    public ExcelSheet<GeneralAction> SheetGeneralActionDe = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.German)!;
-    public ExcelSheet<GeneralAction> SheetGeneralActionFr = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.French)!;
-
-    public ExcelSheet<Action> SheetAction;
+    public ExcelSheet<Lumina.Excel.GeneratedSheets.Action> SheetNameAction = Service.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<GeneralAction> SheetNameGeneralAction = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<Trait> SheetNameTrait = Service.Data.GetExcelSheet<Trait>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<ActionTransient> SheetDescActionTransient = Service.Data.GetExcelSheet<ActionTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<GeneralAction> SheetDescGeneralAction = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.Japanese)!;
+    public ExcelSheet<TraitTransient> SheetDescTraitTransient = Service.Data.GetExcelSheet<TraitTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
 
     public const int NewActionNameNodeId = 1270;
     public const int ActionDescriptionNodeId = 19;
@@ -50,10 +34,10 @@ public partial class TooltipHandler
     public string actionDescriptionTranslation = "";
 
 
-    private void UpdateActionTooltipData()
+    private bool UpdateActionTooltipData()
     {
         var hover = Service.GameGui.HoveredAction;
-        if (hover.ActionID == 0) return;
+        if (hover.ActionID == 0) return false;
 
         var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.GameData?.Abbreviation.ToString();
         // var actionName = "";
@@ -61,115 +45,41 @@ public partial class TooltipHandler
 
         if (hover.ActionKind == HoverActionKind.Action)
         {
-            switch (plugin.Config.LanguageActionTooltipName)
-            {
-                case GameLanguage.Japanese:
-                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
-                    break;
-                case GameLanguage.English:
-                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
-                    break;
-                case GameLanguage.German:
-                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
-                    break;
-                case GameLanguage.French:
-                    actionNameTranslation = SheetAction.GetRow(hover.ActionID)?.Name ?? "null";
-                    break;
-            }
-            switch (plugin.Config.LanguageActionTooltipDescription)
-            {
-                case GameLanguage.Japanese:
-                    actionDescriptionTranslation = SheetActionTransientJp.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.English:
-                    actionDescriptionTranslation = SheetActionTransientEn.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.German:
-                    actionDescriptionTranslation = SheetActionTransientDe.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.French:
-                    actionDescriptionTranslation = SheetActionTransientFr.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-            }
+            actionNameTranslation = SheetNameAction.GetRow(hover.ActionID)?.Name ?? "Not found";
+            actionDescriptionTranslation = SheetDescActionTransient.GetRow(hover.ActionID)?.Description ?? "Not found";
+            return true;
         }
         else if (hover.ActionKind == HoverActionKind.GeneralAction)
         {
-            switch (plugin.Config.LanguageActionTooltipName)
-            {
-                case GameLanguage.Japanese:
-                    actionNameTranslation = SheetGeneralActionJp.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-                case GameLanguage.English:
-                    actionNameTranslation = SheetGeneralActionEn.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-                case GameLanguage.German:
-                    actionNameTranslation = SheetGeneralActionDe.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-                case GameLanguage.French:
-                    actionNameTranslation = SheetGeneralActionFr.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-            }
-            switch (plugin.Config.LanguageActionTooltipDescription)
-            {
-                case GameLanguage.Japanese:
-                    actionDescriptionTranslation = SheetGeneralActionJp.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.English:
-                    actionDescriptionTranslation = SheetGeneralActionEn.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.German:
-                    actionDescriptionTranslation = SheetGeneralActionDe.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.French:
-                    actionDescriptionTranslation = SheetGeneralActionFr.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-            }
+            actionNameTranslation = SheetNameGeneralAction.GetRow(hover.ActionID)?.Name ?? "Not found";
+            actionDescriptionTranslation = SheetDescGeneralAction.GetRow(hover.ActionID)?.Description ?? "Not found";
+            return true;
         }
         else if (hover.ActionKind == HoverActionKind.Trait)
         {
-            switch (plugin.Config.LanguageActionTooltipName)
-            {
-                case GameLanguage.Japanese:
-                    actionNameTranslation = SheetTraitJp.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-                case GameLanguage.English:
-                    actionNameTranslation = SheetTraitEn.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-                case GameLanguage.German:
-                    actionNameTranslation = SheetTraitDe.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-                case GameLanguage.French:
-                    actionNameTranslation = SheetTraitFr.GetRow(hover.ActionID)?.Name ?? "Not found";
-                    break;
-            }
-            switch (plugin.Config.LanguageActionTooltipDescription)
-            {
-                case GameLanguage.Japanese:
-                    actionDescriptionTranslation = SheetTraitTransientJp.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.English:
-                    actionDescriptionTranslation = SheetTraitTransientEn.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.German:
-                    actionDescriptionTranslation = SheetTraitTransientDe.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-                case GameLanguage.French:
-                    actionDescriptionTranslation = SheetTraitTransientFr.GetRow(hover.ActionID)?.Description ?? "Not found";
-                    break;
-            }
+            actionNameTranslation = SheetNameTrait.GetRow(hover.ActionID)?.Name ?? "Not found";
+            actionDescriptionTranslation = SheetDescTraitTransient.GetRow(hover.ActionID)?.Description ?? "Not found";
+            return true;
         }
         else if ((uint)hover.ActionKind == 34 || (uint)hover.ActionKind == 39)
         {
             // 34 for minions, 39 for mounts
             actionNameTranslation = "";
             actionDescriptionTranslation = "";
+            return false;
+        }
+        else if (hover.ActionKind == HoverActionKind.MainCommand || hover.ActionKind == HoverActionKind.ExtraCommand)
+        {
+            // others not related
+            actionNameTranslation = "";
+            actionDescriptionTranslation = "";
+            return false;
         }
         else
         {
-            Service.Log.Debug($"Unsupported action kind for {hover.ActionID} [{hover.ActionKind}]");
+            Service.Log.Warning($"Unsupported action kind for {hover.ActionID} [{hover.ActionKind}]");
+            return false;
         }
-
-
     }
 
     public unsafe void ResetActionTooltip()
@@ -209,27 +119,28 @@ public partial class TooltipHandler
 
         var numberArrayData = ((NumberArrayData**)requestedUpdateArgs.NumberArrayData)[31];
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[28];
-        UpdateActionTooltipData();
-
-        if (plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off)
+        if (UpdateActionTooltipData())
         {
-            AddActionDescriptionTranslation(addon, stringArrayData);
+            if (plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off)
+            {
+                AddActionDescriptionTranslation(addon, stringArrayData);
+            }
+
+            // dump
+            // for (var i = 0; i < stringArrayData->Size; i++)
+            // {
+            //     var addr = new nint(stringArrayData->StringArray[i]);
+            //     var seString = MemoryHelper.ReadSeStringNullTerminated(addr);
+            //     Service.Log.Info($"{addon->NameString} str{i}: {seString.ToJson()}");
+            // }
+            // LUT
+            // 0: action name
+            // 13: action description
+
+            if (plugin.Config.LanguageActionTooltipName == GameLanguage.Off) return;
+
+            AddActionNameTranslation(addon);
         }
-
-        // dump
-        // for (var i = 0; i < stringArrayData->Size; i++)
-        // {
-        //     var addr = new nint(stringArrayData->StringArray[i]);
-        //     var seString = MemoryHelper.ReadSeStringNullTerminated(addr);
-        //     Service.Log.Info($"{addon->NameString} str{i}: {seString.ToJson()}");
-        // }
-        // LUT
-        // 0: action name
-        // 13: action description
-
-        if (plugin.Config.LanguageActionTooltipName == GameLanguage.Off) return;
-
-        AddActionNameTranslation(addon);
     }
 
 
