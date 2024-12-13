@@ -21,6 +21,7 @@ public class ConfigWindow : Window, IDisposable
 
     private BilingualTooltipsPlugin plugin;
     private readonly HotkeyUi temporary_enable_hotkey_helper;
+    private readonly HotkeyUi multilingual_panel_hotkey_helper;
 
     public ConfigWindow(BilingualTooltipsPlugin plugin) : base(
         "BilingualTooltips Configuration"
@@ -35,6 +36,7 @@ public class ConfigWindow : Window, IDisposable
 
         this.plugin = plugin;
         temporary_enable_hotkey_helper = new HotkeyUi();
+        multilingual_panel_hotkey_helper = new HotkeyUi();
     }
 
 
@@ -109,7 +111,7 @@ public class ConfigWindow : Window, IDisposable
         }
         ImGui.SameLine();
         var TemporaryEnableHotkey = plugin.Config.TemporaryEnableHotkey;
-        if (temporary_enable_hotkey_helper.DrawConfigUi("Hotkey", ref TemporaryEnableHotkey, 100))
+        if (temporary_enable_hotkey_helper.DrawConfigUi("Hotkey", ref TemporaryEnableHotkey, 120))
         {
             plugin.Config.TemporaryEnableHotkey = TemporaryEnableHotkey;
             plugin.Config.Save();
@@ -164,10 +166,6 @@ public class ConfigWindow : Window, IDisposable
                     {
                         plugin.TooltipHandler.ResetItemTooltip();
                     }
-                    else
-                    {
-                        plugin.TooltipHandler.UpdateSheetItemName(type);
-                    }
                 }
             }
             ImGui.EndCombo();
@@ -186,7 +184,6 @@ public class ConfigWindow : Window, IDisposable
                 {
                     plugin.Config.LanguageItemTooltipDescription = type;
                     plugin.Config.Save();
-                    plugin.TooltipHandler.UpdateSheetItemDescription(type);
                 }
             }
             ImGui.EndCombo();
@@ -225,10 +222,6 @@ public class ConfigWindow : Window, IDisposable
                     {
                         plugin.TooltipHandler.ResetActionTooltip();
                     }
-                    else
-                    {
-                        plugin.TooltipHandler.UpdateSheetActionName(type);
-                    }
                 }
             }
             ImGui.EndCombo();
@@ -247,7 +240,113 @@ public class ConfigWindow : Window, IDisposable
                 {
                     plugin.Config.LanguageActionTooltipDescription = type;
                     plugin.Config.Save();
-                    plugin.TooltipHandler.UpdateSheetActionDescription(type);
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        ImGui.Columns(1);
+        ImGui.EndChild();
+
+
+        // TABLE Action tooltip
+        ImGui.TextColored(Ui.ColourCyan, "Multilingual panel");
+        ImGuiComponents.HelpMarker(
+            "A separate window where you can see multiple language variations of your choice in a configurable order at the same time."
+        );
+
+        // ItemTooltipPanelUpdateOnHotkey
+        if (ImGui.Checkbox($"Update only on hotkey{suffix}ItemTooltipPanelUpdateOnHotkey", ref P.Config.ItemTooltipPanelUpdateOnHotkey))
+        {
+            plugin.Config.Save();
+        }
+        ImGuiComponents.HelpMarker(
+            "Enable: Update the multilingual panel only when the hotkey is pressed.\n" +
+            "Disable: Update the multilingual panel every time the item tooltip is updated."
+        );
+
+        ImGui.BeginChild("table DrawLanguageConfig Multilingual panel", new Vector2(table_width, table_height * 5), false);
+        ImGui.Columns(2);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
+
+        // Hotkey
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Hotkey");
+        ImGui.NextColumn();
+
+        if (multilingual_panel_hotkey_helper.DrawConfigUi("ItemTooltipPanelHotkey", ref P.Config.ItemTooltipPanelHotkey, col_value_content_width))
+        {
+            plugin.Config.Save();
+        }
+        ImGui.NextColumn();
+
+        // ItemTooltipPanelText1
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Language 1");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ItemTooltipPanelText1", plugin.Config.ItemTooltipPanelText1.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == plugin.Config.ItemTooltipPanelText1))
+                {
+                    plugin.Config.ItemTooltipPanelText1 = type;
+                    plugin.Config.Save();
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        // ItemTooltipPanelText2
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Language 2");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ItemTooltipPanelText2", plugin.Config.ItemTooltipPanelText2.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == plugin.Config.ItemTooltipPanelText2))
+                {
+                    plugin.Config.ItemTooltipPanelText2 = type;
+                    plugin.Config.Save();
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        // ItemTooltipPanelText3
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Language 3");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ItemTooltipPanelText3", plugin.Config.ItemTooltipPanelText3.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == plugin.Config.ItemTooltipPanelText3))
+                {
+                    plugin.Config.ItemTooltipPanelText3 = type;
+                    plugin.Config.Save();
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        // ItemTooltipPanelText4
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Language 4");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ItemTooltipPanelText4", plugin.Config.ItemTooltipPanelText4.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == plugin.Config.ItemTooltipPanelText4))
+                {
+                    plugin.Config.ItemTooltipPanelText4 = type;
+                    plugin.Config.Save();
                 }
             }
             ImGui.EndCombo();

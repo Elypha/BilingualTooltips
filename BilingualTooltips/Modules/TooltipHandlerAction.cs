@@ -21,15 +21,8 @@ namespace BilingualTooltips.Modules;
 
 public partial class TooltipHandler
 {
-    public ExcelSheet<Lumina.Excel.Sheets.Action> SheetNameAction = Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<GeneralAction> SheetNameGeneralAction = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<Trait> SheetNameTrait = Service.Data.GetExcelSheet<Trait>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<ActionTransient> SheetDescActionTransient = Service.Data.GetExcelSheet<ActionTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<GeneralAction> SheetDescGeneralAction = Service.Data.GetExcelSheet<GeneralAction>(Dalamud.Game.ClientLanguage.Japanese)!;
-    public ExcelSheet<TraitTransient> SheetDescTraitTransient = Service.Data.GetExcelSheet<TraitTransient>(Dalamud.Game.ClientLanguage.Japanese)!;
-
     public string actionNameTranslation = "";
-    public string actionDescriptionTranslation = "";
+    public string actionDescTranslation = "";
 
 
     private bool UpdateActionTooltipData()
@@ -38,46 +31,26 @@ public partial class TooltipHandler
         if (hover.ActionID == 0) return false;
 
         var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.Value.Abbreviation.ToString();
-        // var actionName = "";
-        // var actionDescription = "";
 
-        if (hover.ActionKind == HoverActionKind.Action)
-        {
-            actionNameTranslation = SheetNameAction.GetRow(hover.ActionID).Name.ExtractText();
-            actionDescriptionTranslation = SheetDescActionTransient.GetRow(hover.ActionID).Description.ExtractText();
-            return true;
-        }
-        else if (hover.ActionKind == HoverActionKind.GeneralAction)
-        {
-            actionNameTranslation = SheetNameGeneralAction.GetRow(hover.ActionID).Name.ExtractText();
-            actionDescriptionTranslation = SheetDescGeneralAction.GetRow(hover.ActionID).Description.ExtractText();
-            return true;
-        }
-        else if (hover.ActionKind == HoverActionKind.Trait)
-        {
-            actionNameTranslation = SheetNameTrait.GetRow(hover.ActionID).Name.ExtractText();
-            actionDescriptionTranslation = SheetDescTraitTransient.GetRow(hover.ActionID).Description.ExtractText();
-            return true;
-        }
-        else if ((uint)hover.ActionKind == 34 || (uint)hover.ActionKind == 39)
-        {
-            // 34 for minions, 39 for mounts
-            actionNameTranslation = "";
-            actionDescriptionTranslation = "";
-            return false;
-        }
-        else if (hover.ActionKind == HoverActionKind.MainCommand || hover.ActionKind == HoverActionKind.ExtraCommand)
-        {
-            // others not related
-            actionNameTranslation = "";
-            actionDescriptionTranslation = "";
-            return false;
-        }
-        else
-        {
-            Service.Log.Warning($"Unsupported action kind for {hover.ActionID} [{hover.ActionKind}]");
-            return false;
-        }
+        actionNameTranslation = SheetHelper.GetActionName(hover, plugin.Config.LanguageActionTooltipName) ?? "";
+        actionDescTranslation = SheetHelper.GetActionDescription(hover, plugin.Config.LanguageActionTooltipDescription) ?? "";
+        if (string.IsNullOrEmpty(actionNameTranslation) || string.IsNullOrEmpty(actionDescTranslation)) return false;
+
+        SetupActionTooltipPanel(hover);
+
+        return true;
+    }
+
+    private void SetupActionTooltipPanel(HoveredAction hover)
+    {
+        P.ItemTooltipPanel.NameJa = SheetHelper.GetActionName(hover, GameLanguage.Japanese)!;
+        P.ItemTooltipPanel.NameEn = SheetHelper.GetActionName(hover, GameLanguage.English)!;
+        P.ItemTooltipPanel.NameDe = SheetHelper.GetActionName(hover, GameLanguage.German)!;
+        P.ItemTooltipPanel.NameFr = SheetHelper.GetActionName(hover, GameLanguage.French)!;
+        P.ItemTooltipPanel.DescJa = SheetHelper.GetActionDescription(hover, GameLanguage.Japanese)!;
+        P.ItemTooltipPanel.DescEn = SheetHelper.GetActionDescription(hover, GameLanguage.English)!;
+        P.ItemTooltipPanel.DescDe = SheetHelper.GetActionDescription(hover, GameLanguage.German)!;
+        P.ItemTooltipPanel.DescFr = SheetHelper.GetActionDescription(hover, GameLanguage.French)!;
     }
 
     public unsafe void ResetActionTooltip()
@@ -235,7 +208,7 @@ public partial class TooltipHandler
             return;
         }
         currentText.Payloads.Insert(0, new UIForegroundPayload(plugin.Config.ActionDescriptionColourKey));
-        currentText.Payloads.Insert(1, new TextPayload($"{actionDescriptionTranslation}\n\n"));
+        currentText.Payloads.Insert(1, new TextPayload($"{actionDescTranslation}\n\n"));
         currentText.Payloads.Insert(2, new UIForegroundPayload(0));
 
         stringArrayData->SetValue(13, currentText.Encode(), false, true, true);

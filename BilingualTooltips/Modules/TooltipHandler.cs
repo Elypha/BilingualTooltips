@@ -52,12 +52,7 @@ public partial class TooltipHandler
 
     public void StartHook()
     {
-        UpdateSheetItemName(plugin.Config.LanguageItemTooltipName);
-        UpdateSheetItemDescription(plugin.Config.LanguageItemTooltipDescription);
         Service.AddonLifecycle.RegisterListener(AddonEvent.PreRequestedUpdate, "ItemDetail", ItemDetail_PreRequestedUpdate_Handler);
-
-        UpdateSheetActionName(plugin.Config.LanguageActionTooltipName);
-        UpdateSheetActionDescription(plugin.Config.LanguageActionTooltipDescription);
         Service.AddonLifecycle.RegisterListener(AddonEvent.PreRequestedUpdate, "ActionDetail", ActionDetail_PreRequestedUpdate_Handler);
     }
 
@@ -66,87 +61,6 @@ public partial class TooltipHandler
     {
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PreRequestedUpdate, "ItemDetail", ItemDetail_PreRequestedUpdate_Handler);
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PreRequestedUpdate, "ActionDetail", ActionDetail_PreRequestedUpdate_Handler);
-    }
-
-
-    public void UpdateSheetItemName(GameLanguage lang)
-    {
-        plugin.TooltipHandler.SheetNameItem = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<Item>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<Item>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<Item>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<Item>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<Item>(ClientLanguage.Japanese)!,
-        };
-    }
-
-    public void UpdateSheetItemDescription(GameLanguage lang)
-    {
-        plugin.TooltipHandler.SheetDescItem = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<Item>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<Item>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<Item>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<Item>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<Item>(ClientLanguage.Japanese)!,
-        };
-    }
-
-    public void UpdateSheetActionName(GameLanguage lang)
-    {
-        plugin.TooltipHandler.SheetNameAction = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<Lumina.Excel.Sheets.Action>(ClientLanguage.Japanese)!,
-        };
-        plugin.TooltipHandler.SheetNameGeneralAction = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.Japanese)!,
-        };
-        plugin.TooltipHandler.SheetNameTrait = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<Trait>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<Trait>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<Trait>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<Trait>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<Trait>(ClientLanguage.Japanese)!,
-        };
-    }
-
-    public void UpdateSheetActionDescription(GameLanguage lang)
-    {
-        plugin.TooltipHandler.SheetDescActionTransient = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<ActionTransient>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<ActionTransient>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<ActionTransient>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<ActionTransient>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<ActionTransient>(ClientLanguage.Japanese)!,
-        };
-        plugin.TooltipHandler.SheetDescGeneralAction = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<GeneralAction>(ClientLanguage.Japanese)!,
-        };
-        plugin.TooltipHandler.SheetDescTraitTransient = lang switch
-        {
-            GameLanguage.Japanese => Service.Data.GetExcelSheet<TraitTransient>(ClientLanguage.Japanese)!,
-            GameLanguage.English => Service.Data.GetExcelSheet<TraitTransient>(ClientLanguage.English)!,
-            GameLanguage.German => Service.Data.GetExcelSheet<TraitTransient>(ClientLanguage.German)!,
-            GameLanguage.French => Service.Data.GetExcelSheet<TraitTransient>(ClientLanguage.French)!,
-            _ => Service.Data.GetExcelSheet<TraitTransient>(ClientLanguage.Japanese)!,
-        };
     }
 
 

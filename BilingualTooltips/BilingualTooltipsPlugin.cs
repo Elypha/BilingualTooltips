@@ -50,7 +50,7 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
     // WINDOWS
     public ConfigWindow ConfigWindow { get; init; }
     public MainWindow MainWindow { get; init; }
-    public ItemTooltipPanel itemTooltipPanel { get; init; }
+    public ItemTooltipPanel ItemTooltipPanel { get; init; }
     public WindowSystem WindowSystem = new("BilingualTooltips");
 
 
@@ -104,10 +104,10 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
 
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
-        itemTooltipPanel = new ItemTooltipPanel(this);
+        ItemTooltipPanel = new ItemTooltipPanel(this);
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
-        WindowSystem.AddWindow(itemTooltipPanel);
+        WindowSystem.AddWindow(ItemTooltipPanel);
 
 
         // HANDLERS
@@ -132,7 +132,7 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         // unload windows
         ConfigWindow.Dispose();
         MainWindow.Dispose();
-        itemTooltipPanel.Dispose();
+        ItemTooltipPanel.Dispose();
 
         // unload event handlers
         Service.PluginInterface.UiBuilder.Draw -= DrawUI;
@@ -205,6 +205,13 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
 
     public void OnFrameUpdate(IFramework framework)
     {
+        if (!P.ItemTooltipPanel.IsIdle && !Hotkey.IsActive(Config.ItemTooltipPanelHotkey)) P.ItemTooltipPanel.IsIdle = true;
+        if (Hotkey.IsActive(Config.ItemTooltipPanelHotkey) && P.ItemTooltipPanel.IsIdle)
+        {
+            P.ItemTooltipPanel.OnHotkeyTriggered();
+            P.ItemTooltipPanel.IsIdle = false;
+        }
+
     }
 
     public void ToggleEnabled(bool? target = null)

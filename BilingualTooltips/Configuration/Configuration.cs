@@ -19,11 +19,12 @@ public class BilingualTooltipsConfig : IMioConfig
     public bool Enabled = true;
     public bool TemporaryEnableOnly = false;
     public VirtualKey[] TemporaryEnableHotkey = [VirtualKey.CONTROL, VirtualKey.X];
-    // public VirtualKey[] ItemTooltipPanelHotkey = [VirtualKey.CONTROL, VirtualKey.X];
-    // public GameLanguage ItemTooltipPanelText1 = GameLanguage.Japanese;
-    // public GameLanguage ItemTooltipPanelText2 = GameLanguage.English;
-    // public GameLanguage ItemTooltipPanelText3 = GameLanguage.Off;
-    // public GameLanguage ItemTooltipPanelText4 = GameLanguage.Off;
+    public VirtualKey[] ItemTooltipPanelHotkey = [VirtualKey.X];
+    public bool ItemTooltipPanelUpdateOnHotkey = true;
+    public GameLanguage ItemTooltipPanelText1 = GameLanguage.Japanese;
+    public GameLanguage ItemTooltipPanelText2 = GameLanguage.English;
+    public GameLanguage ItemTooltipPanelText3 = GameLanguage.German;
+    public GameLanguage ItemTooltipPanelText4 = GameLanguage.French;
     public VirtualKey[] ActionTooltipPanelHotkey = [VirtualKey.CONTROL, VirtualKey.X];
     public GameLanguage LanguageItemTooltipName = GameLanguage.Japanese;
     public GameLanguage LanguageItemTooltipDescription = GameLanguage.Japanese;

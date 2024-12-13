@@ -15,43 +15,43 @@ using Dalamud.Game.Gui;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using BilingualTooltips.Modules;
 
 
 namespace BilingualTooltips.Modules;
 
 public partial class TooltipHandler
 {
-    public ExcelSheet<Item> SheetNameItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese);
-    public ExcelSheet<Item> SheetDescItem = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.Japanese);
-
     public string itemNameTranslation = "";
-    public string itemDescriptionTranslation = "";
-    public bool isShowItemGlamName = true;
+    public string itemDescTranslation = "";
 
 
-    private void UpdateItemTooltipData()
+    private bool UpdateItemTooltipData()
     {
         // get item id
         var itemId = Service.GameGui.HoveredItem;
-        if (itemId < 2000000)
-        {
-            itemId %= 500000;
-        }
+        if (itemId == 0) return false;
 
-        itemNameTranslation = SheetNameItem.GetRow((uint)itemId).Name.ExtractText();
-        itemDescriptionTranslation = SheetDescItem.GetRow((uint)itemId).Description.ExtractText();
+        Service.Log.Debug($"Hovered item: {itemId}");
+        itemNameTranslation = SheetHelper.GetItemName(itemId, plugin.Config.LanguageItemTooltipName) ?? "";
+        if (string.IsNullOrEmpty(itemNameTranslation)) return false;
+        itemDescTranslation = SheetHelper.GetItemDescription(itemId, plugin.Config.LanguageItemTooltipDescription) ?? "";
+
+        SetupItemTooltipPanel(itemId);
+
+        return true;
     }
 
-    private void SetupItemTooltipPanel()
+    private void SetupItemTooltipPanel(ulong itemId)
     {
-        // if (!Hotkey.IsActive(plugin.Config.ItemTooltipPanelHotkey)) return;
-
-        // P.itemTooltipPanel.translations.Clear();
-
-        // if (P.Config.ItemTooltipPanelText1 != GameLanguage.Off)
-        // {
-        //     P.itemTooltipPanel.translations.Add($"{P.Config.ItemTooltipPanelText1}: {itemNameTranslation}");
-        // }
+        P.ItemTooltipPanel.NameJa = SheetHelper.GetItemName(itemId, GameLanguage.Japanese)!;
+        P.ItemTooltipPanel.NameEn = SheetHelper.GetItemName(itemId, GameLanguage.English)!;
+        P.ItemTooltipPanel.NameDe = SheetHelper.GetItemName(itemId, GameLanguage.German)!;
+        P.ItemTooltipPanel.NameFr = SheetHelper.GetItemName(itemId, GameLanguage.French)!;
+        P.ItemTooltipPanel.DescJa = SheetHelper.GetItemDescription(itemId, GameLanguage.Japanese)!;
+        P.ItemTooltipPanel.DescEn = SheetHelper.GetItemDescription(itemId, GameLanguage.English)!;
+        P.ItemTooltipPanel.DescDe = SheetHelper.GetItemDescription(itemId, GameLanguage.German)!;
+        P.ItemTooltipPanel.DescFr = SheetHelper.GetItemDescription(itemId, GameLanguage.French)!;
     }
 
 
@@ -93,32 +93,31 @@ public partial class TooltipHandler
 
         var numberArrayData = ((NumberArrayData**)requestedUpdateArgs.NumberArrayData)[29];
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[26];
-        UpdateItemTooltipData();
-
-        SetupItemTooltipPanel();
-
-        if (plugin.Config.LanguageItemTooltipDescription != GameLanguage.Off)
+        if (UpdateItemTooltipData())
         {
-            AddItemDescriptionTranslation(addon, stringArrayData);
+            if (plugin.Config.LanguageItemTooltipDescription != GameLanguage.Off)
+            {
+                AddItemDescriptionTranslation(addon, stringArrayData);
+            }
+
+            // dump
+            // for (var i = 0; i < stringArrayData->Size; i++)
+            // {
+            //     var addr = new nint(stringArrayData->StringArray[i]);
+            //     var seString = MemoryHelper.ReadSeStringNullTerminated(addr);
+            //     Service.PluginLog.Info($"{addon->NameString} str{i}: {seString.ToJson()}");
+            // }
+            // LUT
+            // 0: item name
+            // 2: item category
+            // 13: item description
+            // var normalName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[0]));
+            // var glamName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[1]));
+
+            if (plugin.Config.LanguageItemTooltipName == GameLanguage.Off) return;
+
+            AddItemNameTranslation(addon);
         }
-
-        // dump
-        // for (var i = 0; i < stringArrayData->Size; i++)
-        // {
-        //     var addr = new nint(stringArrayData->StringArray[i]);
-        //     var seString = MemoryHelper.ReadSeStringNullTerminated(addr);
-        //     Service.PluginLog.Info($"{addon->NameString} str{i}: {seString.ToJson()}");
-        // }
-        // LUT
-        // 0: item name
-        // 2: item category
-        // 13: item description
-        // var normalName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[0]));
-        // var glamName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[1]));
-
-        if (plugin.Config.LanguageItemTooltipName == GameLanguage.Off) return;
-
-        AddItemNameTranslation(addon);
     }
 
 
@@ -213,7 +212,7 @@ public partial class TooltipHandler
             return;
         }
         currentText.Payloads.Insert(0, new UIForegroundPayload(plugin.Config.ItemDescriptionColourKey));
-        currentText.Payloads.Insert(1, new TextPayload($"{itemDescriptionTranslation}\n\n"));
+        currentText.Payloads.Insert(1, new TextPayload($"{itemDescTranslation}\n\n"));
         currentText.Payloads.Insert(2, new UIForegroundPayload(0));
 
         stringArrayData->SetValue(13, currentText.Encode(), false, true, true);

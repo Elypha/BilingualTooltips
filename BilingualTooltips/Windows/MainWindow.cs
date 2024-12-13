@@ -20,6 +20,7 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System;
+using BilingualTooltips.Modules;
 
 
 namespace BilingualTooltips.Windows;
@@ -70,5 +71,19 @@ public class MainWindow : Window, IDisposable
         ImGui.Text("Please let me know if you have any questions or suggestions via:");
         ImGui.Text("- Dalamud Discord > plugin-help-forum");
         ImGui.Text("- Discord PM: elypha");
+
+        if (ImGui.Button("Test"))
+        {
+            DoTest();
+        }
+    }
+
+    private void DoTest()
+    {
+        // SheetHelper.SheetItemJa.Where(x => x.RowId == 41760).ToList().ForEach(x => Service.Log.Debug(x.Name.ToString()));
+        var name = SheetHelper.GetItemName(41760, GameLanguage.Japanese);
+        Service.Log.Debug($"Name: {name}");
+        var desc = SheetHelper.GetItemDescription(41760, GameLanguage.Japanese);
+        Service.Log.Debug($"Desc: {desc}");
     }
 }
