@@ -3,10 +3,12 @@ name: BilingualTooltips
 repo_url: https://github.com/Elypha/BilingualTooltips
 punchline: In case the WoL speaks more than one language
 description: |
-  Yes, we have tooltips displayed in two languages now. You paid SE for 4 languages so make good use of it.
+  Yes, we have tooltips displayed in two languages now. You paid SE for 4 languages so make very good use of it.
 
-  - Wanna know and learn how that item is written in another language? - No problem.
-  - Got fed up of カタカナ and would rather read the English words? - We've got you.
+  - Interested in localised item descriptions in different languages?
+  - Got fed up of transliterated カタカナ and would rather read just the original words?
+
+  We've got you! See plugin config to customise your own experience.
 
 tags:
   - Tooltip
