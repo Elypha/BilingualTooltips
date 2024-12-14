@@ -256,30 +256,10 @@ public class ConfigWindow : Window, IDisposable
             "A separate window where you can see multiple language variations of your choice in a configurable order at the same time."
         );
 
-        // ItemTooltipPanelUpdateOnHotkey
-        if (ImGui.Checkbox($"Update only on hotkey{suffix}ItemTooltipPanelUpdateOnHotkey", ref P.Config.ItemTooltipPanelUpdateOnHotkey))
-        {
-            plugin.Config.Save();
-        }
-        ImGuiComponents.HelpMarker(
-            "Enable: Update the multilingual panel only when the hotkey is pressed.\n" +
-            "Disable: Update the multilingual panel every time the item tooltip is updated."
-        );
-
-        ImGui.BeginChild("table DrawLanguageConfig Multilingual panel", new Vector2(table_width, table_height * 5), false);
+        ImGui.BeginChild("table DrawLanguageConfig Multilingual panel", new Vector2(table_width, table_height * 4), false);
         ImGui.Columns(2);
         ImGui.SetColumnWidth(0, col_name_width);
         ImGui.SetColumnWidth(1, col_value_width);
-
-        // Hotkey
-        ImGui.TextColored(Ui.ColourWhiteDim, "　Hotkey");
-        ImGui.NextColumn();
-
-        if (multilingual_panel_hotkey_helper.DrawConfigUi("ItemTooltipPanelHotkey", ref P.Config.ItemTooltipPanelHotkey, col_value_content_width))
-        {
-            plugin.Config.Save();
-        }
-        ImGui.NextColumn();
 
         // ItemTooltipPanelText1
         ImGui.TextColored(Ui.ColourWhiteDim, "　Language 1");
@@ -355,6 +335,111 @@ public class ConfigWindow : Window, IDisposable
 
         ImGui.Columns(1);
         ImGui.EndChild();
+
+        // ItemTooltipPanelHotkeyEnabled
+        if (ImGui.Checkbox($"Enable hotkey{suffix}ItemTooltipPanelHotkeyEnabled", ref P.Config.ItemTooltipPanelHotkeyEnabled))
+        {
+            P.Config.Save();
+        }
+        ImGuiComponents.HelpMarker(
+            "Use a hotkey to control the multilingual panel. However, whether enabled or not, you can always use the command '/btt ml' for the same function."
+        );
+
+        if (P.Config.ItemTooltipPanelHotkeyEnabled)
+        {
+            // Hotkey
+            ImGui.Text("┗");
+            ImGui.SameLine();
+            ImGui.TextColored(Ui.ColourWhiteDim, "Hotkey");
+            ImGui.SameLine();
+            if (multilingual_panel_hotkey_helper.DrawConfigUi("ItemTooltipPanelHotkey", ref P.Config.ItemTooltipPanelHotkey, col_value_content_width))
+            {
+                plugin.Config.Save();
+            }
+
+            // ItemTooltipPanelHotkeyOpenWindow
+            ImGui.Text("┗");
+            ImGui.SameLine();
+            if (ImGui.Checkbox($"can bring up the window{suffix}ItemTooltipPanelHotkeyOpenWindow", ref P.Config.ItemTooltipPanelHotkeyOpenWindow))
+            {
+                P.Config.Save();
+            }
+            ImGuiComponents.HelpMarker(
+                "Enable: When window is not shown, the hotkey will bring it up. If 'can trigger windows content update' (below) is not enabled, the hotkey can also be used to close the window.\n" +
+                "Disable: The above will not happen."
+            );
+
+            // ItemTooltipPanelUpdateOnHotkey
+            ImGui.Text("┗");
+            ImGui.SameLine();
+            if (ImGui.Checkbox($"can trigger windows content update{suffix}ItemTooltipPanelUpdateOnHotkey", ref P.Config.ItemTooltipPanelUpdateOnHotkey))
+            {
+                P.Config.Save();
+            }
+            ImGuiComponents.HelpMarker(
+                "Enable: Update the multilingual panel only when the hotkey is pressed.\n" +
+                "Disable: Update the multilingual panel every time your item tooltip is updated."
+            );
+        }
+
+
+
+        // TABLE Content finder
+        ImGui.TextColored(Ui.ColourCyan, "Content finder");
+        ImGuiComponents.HelpMarker(
+            "The language you want to display below all kinds of content finder window."
+        );
+
+        ImGui.BeginChild("table DrawLanguageConfig Content finder", new Vector2(table_width, table_height * 2), false);
+        ImGui.Columns(2);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
+
+        // ContentFinderName
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Name");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ContentFinderName", P.Config.ContentFinderName.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentFinderName))
+                {
+                    P.Config.ContentFinderName = type;
+                    P.Config.Save();
+                    if (type == GameLanguage.Off)
+                    {
+                        plugin.ContentHandler.ResetJournalDetail();
+                    }
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        // ContentFinderDescription
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Description");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ContentFinderDescription", P.Config.ContentFinderDescription.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentFinderDescription))
+                {
+                    P.Config.ContentFinderDescription = type;
+                    P.Config.Save();
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        ImGui.Columns(1);
+        ImGui.EndChild();
+
+
+
     }
 
 

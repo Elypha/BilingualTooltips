@@ -56,6 +56,17 @@ public static class SheetHelper
     public static ExcelSheet<Item> SheetItemDe = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.German);
     public static ExcelSheet<Item> SheetItemFr = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.French);
 
+    // ContentFinder
+    public static ExcelSheet<ContentFinderCondition> SheetContentFinderConditionJa = Service.Data.GetExcelSheet<ContentFinderCondition>(Dalamud.Game.ClientLanguage.Japanese);
+    public static ExcelSheet<ContentFinderCondition> SheetContentFinderConditionEn = Service.Data.GetExcelSheet<ContentFinderCondition>(Dalamud.Game.ClientLanguage.English);
+    public static ExcelSheet<ContentFinderCondition> SheetContentFinderConditionDe = Service.Data.GetExcelSheet<ContentFinderCondition>(Dalamud.Game.ClientLanguage.German);
+    public static ExcelSheet<ContentFinderCondition> SheetContentFinderConditionFr = Service.Data.GetExcelSheet<ContentFinderCondition>(Dalamud.Game.ClientLanguage.French);
+
+    // Roulette
+    public static ExcelSheet<ContentRoulette> SheetContentRouletteJa = Service.Data.GetExcelSheet<ContentRoulette>(Dalamud.Game.ClientLanguage.Japanese);
+    public static ExcelSheet<ContentRoulette> SheetContentRouletteEn = Service.Data.GetExcelSheet<ContentRoulette>(Dalamud.Game.ClientLanguage.English);
+    public static ExcelSheet<ContentRoulette> SheetContentRouletteDe = Service.Data.GetExcelSheet<ContentRoulette>(Dalamud.Game.ClientLanguage.German);
+    public static ExcelSheet<ContentRoulette> SheetContentRouletteFr = Service.Data.GetExcelSheet<ContentRoulette>(Dalamud.Game.ClientLanguage.French);
 
     public static string? GetActionName(HoveredAction action, GameLanguage lang)
     {
@@ -186,5 +197,68 @@ public static class SheetHelper
     public static uint GetRealItemId(ulong id)
     {
         return id < 2000000 ? (uint)id % 500000 : (uint)id;
+    }
+
+    public static string? GetContentName(string name, GameLanguage lang)
+    {
+        var type = GetContentType(name, out var RowId);
+
+        return type switch
+        {
+            ContentType.Duty => lang switch
+            {
+                GameLanguage.Japanese => SheetContentFinderConditionJa.GetRow(RowId).Name.ExtractText(),
+                GameLanguage.English => SheetContentFinderConditionEn.GetRow(RowId).Name.ExtractText(),
+                GameLanguage.German => SheetContentFinderConditionDe.GetRow(RowId).Name.ExtractText(),
+                GameLanguage.French => SheetContentFinderConditionFr.GetRow(RowId).Name.ExtractText(),
+                _ => null,
+            },
+            ContentType.Roulette => lang switch
+            {
+                GameLanguage.Japanese => SheetContentRouletteJa.GetRow(RowId).Name.ExtractText(),
+                GameLanguage.English => SheetContentRouletteEn.GetRow(RowId).Name.ExtractText(),
+                GameLanguage.German => SheetContentRouletteDe.GetRow(RowId).Name.ExtractText(),
+                GameLanguage.French => SheetContentRouletteFr.GetRow(RowId).Name.ExtractText(),
+                _ => null,
+            },
+            _ => null,
+        };
+    }
+
+    public enum ContentType
+    {
+        Unknown,
+        Duty,
+        Roulette,
+    }
+
+    public static ContentType GetContentType(string name, out uint RowId)
+    {
+        // remove line break
+        name = name.Replace(Dalamud.Game.Text.SeStringHandling.Payloads.NewLinePayload.Payload.Text, "");
+
+        RowId = P.ClientLanguage switch
+        {
+            Dalamud.Game.ClientLanguage.Japanese => SheetContentFinderConditionJa.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.English => SheetContentFinderConditionEn.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.German => SheetContentFinderConditionDe.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.French => SheetContentFinderConditionFr.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            _ => 0,
+        };
+        if (RowId != 0) return ContentType.Duty;
+
+        RowId = P.ClientLanguage switch
+        {
+            Dalamud.Game.ClientLanguage.Japanese => SheetContentRouletteJa.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.English => SheetContentRouletteEn.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.German => SheetContentRouletteDe.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.French => SheetContentRouletteFr.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            _ => 0,
+        };
+        if (RowId != 0) return ContentType.Roulette;
+
+        Service.Log.Debug($"Unknown content name: {name}");
+
+        return ContentType.Unknown;
     }
 }

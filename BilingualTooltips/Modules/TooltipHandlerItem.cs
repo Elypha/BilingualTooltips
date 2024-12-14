@@ -32,7 +32,6 @@ public partial class TooltipHandler
         var itemId = Service.GameGui.HoveredItem;
         if (itemId == 0) return false;
 
-        Service.Log.Debug($"Hovered item: {itemId}");
         itemNameTranslation = SheetHelper.GetItemName(itemId, plugin.Config.LanguageItemTooltipName) ?? "";
         itemDescTranslation = SheetHelper.GetItemDescription(itemId, plugin.Config.LanguageItemTooltipDescription) ?? "";
 

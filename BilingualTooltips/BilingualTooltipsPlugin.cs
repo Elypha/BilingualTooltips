@@ -43,14 +43,16 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
     internal BilingualTooltipsConfig Config;
     public StyleModel PluginTheme { get; set; }
     public bool PluginThemeEnabled { get; set; }
+    public Dalamud.Game.ClientLanguage ClientLanguage;
 
     // MODULES
     public TooltipHandler TooltipHandler { get; set; } = null!;
+    public ContentHandler ContentHandler { get; set; } = null!;
 
     // WINDOWS
     public ConfigWindow ConfigWindow { get; init; }
     public MainWindow MainWindow { get; init; }
-    public ItemTooltipPanel ItemTooltipPanel { get; init; }
+    public MultilingualPanel ItemTooltipPanel { get; init; }
     public WindowSystem WindowSystem = new("BilingualTooltips");
 
 
@@ -79,6 +81,7 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         MioConfig.Setup(MainConfigFileName: "main.json");
         if (Service.PluginInterface.ConfigFile.Exists) MioConfig.Migrate<BilingualTooltipsConfig>(Service.PluginInterface.ConfigFile.FullName);
         Config = MioConfig.Init<BilingualTooltipsConfig>();
+        ClientLanguage = Service.ClientState.ClientLanguage;
 
         // theme
         ImGuiThemeLoadCustomOrDefault();
@@ -90,7 +93,8 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
                 "└ /btt → open the main window.\n" +
                 "└ /btt c|config → open the configuration window.\n" +
                 "└ /btt enabled → toggle if plugin is enabled.\n" +
-                "└ /btt enabled true|false → set if plugin is enabled."
+                "└ /btt enabled true|false → set if plugin is enabled.\n" +
+                "└ /btt ml → the same function as the hotkey but in text command form."
         });
 
 
@@ -98,13 +102,15 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
 
         TooltipHandler = new TooltipHandler(this);
         TooltipHandler.StartHook();
+        ContentHandler = new ContentHandler(this);
+        ContentHandler.StartHook();
 
 
         // WINDOWS
 
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
-        ItemTooltipPanel = new ItemTooltipPanel(this);
+        ItemTooltipPanel = new MultilingualPanel(this);
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
         WindowSystem.AddWindow(ItemTooltipPanel);
@@ -128,6 +134,8 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         // unload modules
         TooltipHandler.StopHook();
         TooltipHandler.Dispose();
+        ContentHandler.StopHook();
+        ContentHandler.Dispose();
 
         // unload windows
         ConfigWindow.Dispose();
@@ -199,6 +207,12 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
                 {
                     ToggleEnabled();
                 }
+                break;
+            case "ml":
+                ItemTooltipPanel.OnHotkeyTriggered();
+                break;
+            default:
+                Notice.Error("Invalid command argument.");
                 break;
         }
     }

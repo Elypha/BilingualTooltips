@@ -3,14 +3,14 @@ using Miosuke.UiHelper;
 
 namespace BilingualTooltips.Windows;
 
-public class ItemTooltipPanel : Window, IDisposable
+public class MultilingualPanel : Window, IDisposable
 {
     private BilingualTooltipsPlugin plugin;
 
     public List<string> translations = [];
 
-    public ItemTooltipPanel(BilingualTooltipsPlugin plugin) : base(
-        "ItemTooltipPanel",
+    public MultilingualPanel(BilingualTooltipsPlugin plugin) : base(
+        "Multilingual Panel",
         ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         Size = new Vector2(720, 720);
@@ -53,8 +53,19 @@ public class ItemTooltipPanel : Window, IDisposable
 
     public void OnHotkeyTriggered()
     {
-        Service.Log.Debug("ItemTooltipPanel hotkey triggered");
-        if (!IsOpen) IsOpen = true;
+        if (!P.Config.ItemTooltipPanelHotkeyEnabled) return;
+
+        if (P.Config.ItemTooltipPanelHotkeyOpenWindow)
+        {
+            if (!IsOpen)
+            {
+                IsOpen = true;
+            }
+            else if (IsOpen && !P.Config.ItemTooltipPanelUpdateOnHotkey)
+            {
+                IsOpen = false;
+            }
+        }
 
         if (P.Config.ItemTooltipPanelUpdateOnHotkey)
         {
