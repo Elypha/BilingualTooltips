@@ -52,11 +52,13 @@ public partial class ContentHandler
         if (originalNamePtr == null) return;
         var originalName = MemoryHelper.ReadSeString(&originalNamePtr->NodeText).TextValue;
 
-        ResetJournalDetail();
+        if (plugin.Config.ContentsFinderName != GameLanguage.Off)
+        {
+            ResetJournalDetail();
 
-        ContentNameTranslation = SheetHelper.GetContentName(originalName, plugin.Config.ContentsFinderName) ?? "";
-
-        AddJournalDetailNameTranslation(addon);
+            ContentNameTranslation = SheetHelper.GetContentName(originalName, plugin.Config.ContentsFinderName) ?? "";
+            AddJournalDetailNameTranslation(addon);
+        }
     }
 
     public unsafe void ResetJournalDetail()
@@ -142,7 +144,7 @@ public partial class ContentHandler
         translationNode->AtkResNode.ToggleVisibility(true);
 
         var lines = new SeString();
-        lines.Payloads.Add(new UIForegroundPayload(plugin.Config.ContentNameColourKey));
+        lines.Payloads.Add(new UIForegroundPayload((ushort)plugin.Config.ContentNameColourKey));
         lines.Payloads.Add(new TextPayload($"～ {ContentNameTranslation} ～"));
         lines.Payloads.Add(new UIForegroundPayload(0));
         translationNode->SetText(lines.Encode());

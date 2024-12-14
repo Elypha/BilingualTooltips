@@ -419,6 +419,9 @@ public class ConfigWindow : Window, IDisposable
 
         // ContentsFinderDescription
         ImGui.TextColored(Ui.ColourWhiteDim, "　Description");
+        ImGuiComponents.HelpMarker(
+            "WIP (low priority)"
+        );
         ImGui.NextColumn();
         ImGui.SetNextItemWidth(col_value_content_width);
         if (ImGui.BeginCombo($"{suffix}ContentsFinderDescription", P.Config.ContentsFinderDescription.ToString()))
@@ -477,7 +480,7 @@ public class ConfigWindow : Window, IDisposable
             "The colour code is a NUMBER, like 3 (default). You can find all colour codes in /xldata > UIColour > Row ID."
         );
 
-        ImGui.BeginChild("table DrawUiConfig Translation colour", new Vector2(table_width, table_height * 4), false);
+        ImGui.BeginChild("table DrawUiConfig Translation colour", new Vector2(table_width, table_height * 6), false);
         ImGui.Columns(2);
         ImGui.SetColumnWidth(0, col_name_width);
         ImGui.SetColumnWidth(1, col_value_width);
@@ -485,24 +488,20 @@ public class ConfigWindow : Window, IDisposable
         // ItemNameColourKey
         ImGui.TextColored(Ui.ColourWhiteDim, "　Item name");
         ImGui.NextColumn();
-        var ItemNameColourKey = (int)plugin.Config.ItemNameColourKey;
         ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.InputInt($"{suffix}ItemNameColourKey", ref ItemNameColourKey))
+        if (ImGui.InputInt($"{suffix}ItemNameColourKey", ref P.Config.ItemNameColourKey))
         {
-            plugin.Config.ItemNameColourKey = (ushort)ItemNameColourKey;
-            plugin.Config.Save();
+            P.Config.Save();
         }
         ImGui.NextColumn();
 
         // ItemDescriptionColourKey
         ImGui.TextColored(Ui.ColourWhiteDim, "　Item description");
         ImGui.NextColumn();
-        var ItemDescriptionColourKey = (int)plugin.Config.ItemDescriptionColourKey;
         ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.InputInt($"{suffix}ItemDescriptionColourKey", ref ItemDescriptionColourKey))
+        if (ImGui.InputInt($"{suffix}ItemDescriptionColourKey", ref P.Config.ItemDescriptionColourKey))
         {
-            plugin.Config.ItemDescriptionColourKey = (ushort)ItemDescriptionColourKey;
-            plugin.Config.Save();
+            P.Config.Save();
         }
         ImGui.NextColumn();
 
@@ -510,24 +509,40 @@ public class ConfigWindow : Window, IDisposable
         // ActionNameColourKey
         ImGui.TextColored(Ui.ColourWhiteDim, "　Action name");
         ImGui.NextColumn();
-        var ActionNameColourKey = (int)plugin.Config.ActionNameColourKey;
         ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.InputInt($"{suffix}ActionNameColourKey", ref ActionNameColourKey))
+        if (ImGui.InputInt($"{suffix}ActionNameColourKey", ref P.Config.ActionNameColourKey))
         {
-            plugin.Config.ActionNameColourKey = (ushort)ActionNameColourKey;
-            plugin.Config.Save();
+            P.Config.Save();
         }
         ImGui.NextColumn();
 
         // ActionDescriptionColourKey
         ImGui.TextColored(Ui.ColourWhiteDim, "　Action description");
         ImGui.NextColumn();
-        var ActionDescriptionColourKey = (int)plugin.Config.ActionDescriptionColourKey;
         ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.InputInt($"{suffix}ActionDescriptionColourKey", ref ActionDescriptionColourKey))
+        if (ImGui.InputInt($"{suffix}ActionDescriptionColourKey", ref P.Config.ActionDescriptionColourKey))
         {
-            plugin.Config.ActionDescriptionColourKey = (ushort)ActionDescriptionColourKey;
-            plugin.Config.Save();
+            P.Config.Save();
+        }
+        ImGui.NextColumn();
+
+        // ContentNameColourKey
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Duty name");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputInt($"{suffix}ContentNameColourKey", ref P.Config.ContentNameColourKey))
+        {
+            P.Config.Save();
+        }
+        ImGui.NextColumn();
+
+        // ContentDescColourKey
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Duty description");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputInt($"{suffix}ContentDescColourKey", ref P.Config.ContentDescColourKey))
+        {
+            P.Config.Save();
         }
         ImGui.NextColumn();
 
@@ -597,6 +612,28 @@ public class ConfigWindow : Window, IDisposable
             plugin.Config.Save();
         }
         ImGuiComponents.HelpMarker("Default: -8.5");
+        ImGui.NextColumn();
+
+        // OffsetContentNameOriginal
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Duty name");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputFloat($"{suffix}OffsetContentNameOriginal", ref P.Config.OffsetContentNameOriginal))
+        {
+            P.Config.Save();
+        }
+        ImGuiComponents.HelpMarker("Default: -1.5");
+        ImGui.NextColumn();
+
+        // OffsetContentNameTranslation
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Duty name translation");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputFloat($"{suffix}OffsetContentNameTranslation", ref P.Config.OffsetContentNameTranslation))
+        {
+            P.Config.Save();
+        }
+        ImGuiComponents.HelpMarker("Default: 7.0");
         ImGui.NextColumn();
 
         // // OffsetGlamName

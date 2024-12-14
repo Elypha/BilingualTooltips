@@ -36,8 +36,6 @@ public partial class ContentHandler
         // if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
         if (!plugin.Config.Enabled) return;
 
-        Service.Log.Debug("[ContentsFinderConfirmHandler] triggered");
-
         var addon = (AtkUnitBase*)args.Addon;
         if (!addon->IsVisible) return;
 
@@ -54,11 +52,13 @@ public partial class ContentHandler
         if (originalNamePtr == null) return;
         var originalName = MemoryHelper.ReadSeString(&originalNamePtr->NodeText).TextValue;
 
-        ResetContentConfirm();
+        if (plugin.Config.ContentsFinderName != GameLanguage.Off)
+        {
+            ResetContentConfirm();
 
-        ContentNameTranslation = SheetHelper.GetContentName(originalName, plugin.Config.ContentsFinderName) ?? "";
-
-        AddContentConfirmNameTranslation(addon);
+            ContentNameTranslation = SheetHelper.GetContentName(originalName, plugin.Config.ContentsFinderName) ?? "";
+            AddContentConfirmNameTranslation(addon);
+        }
     }
 
     public unsafe void ResetContentConfirm()
@@ -144,7 +144,7 @@ public partial class ContentHandler
         translationNode->AtkResNode.ToggleVisibility(true);
 
         var lines = new SeString();
-        lines.Payloads.Add(new UIForegroundPayload(plugin.Config.ContentNameColourKey));
+        lines.Payloads.Add(new UIForegroundPayload((ushort)plugin.Config.ContentNameColourKey));
         lines.Payloads.Add(new TextPayload($"～ {ContentNameTranslation} ～"));
         lines.Payloads.Add(new UIForegroundPayload(0));
         translationNode->SetText(lines.Encode());

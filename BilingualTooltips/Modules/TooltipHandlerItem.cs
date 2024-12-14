@@ -179,7 +179,7 @@ public partial class TooltipHandler
         textNode->AtkResNode.ToggleVisibility(true);
 
         var lines = new SeString();
-        lines.Payloads.Add(new UIForegroundPayload(plugin.Config.ItemNameColourKey));
+        lines.Payloads.Add(new UIForegroundPayload((ushort)plugin.Config.ItemNameColourKey));
         lines.Payloads.Add(new TextPayload($"{itemNameTranslation}"));
         lines.Payloads.Add(new UIForegroundPayload(0));
         textNode->SetText(lines.Encode());
@@ -210,7 +210,7 @@ public partial class TooltipHandler
         {
             return;
         }
-        currentText.Payloads.Insert(0, new UIForegroundPayload(plugin.Config.ItemDescriptionColourKey));
+        currentText.Payloads.Insert(0, new UIForegroundPayload((ushort)plugin.Config.ItemDescriptionColourKey));
         currentText.Payloads.Insert(1, new TextPayload($"{itemDescTranslation}\n\n"));
         currentText.Payloads.Insert(2, new UIForegroundPayload(0));
 
