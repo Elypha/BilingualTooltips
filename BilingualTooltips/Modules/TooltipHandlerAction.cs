@@ -34,7 +34,6 @@ public partial class TooltipHandler
 
         actionNameTranslation = SheetHelper.GetActionName(hover, plugin.Config.LanguageActionTooltipName) ?? "";
         actionDescTranslation = SheetHelper.GetActionDescription(hover, plugin.Config.LanguageActionTooltipDescription) ?? "";
-        if (string.IsNullOrEmpty(actionNameTranslation) || string.IsNullOrEmpty(actionDescTranslation)) return false;
 
         SetupActionTooltipPanel(hover);
 
@@ -92,7 +91,7 @@ public partial class TooltipHandler
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[28];
         if (UpdateActionTooltipData())
         {
-            if (plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off)
+            if ((plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off) && !string.IsNullOrEmpty(actionDescTranslation))
             {
                 AddActionDescriptionTranslation(addon, stringArrayData);
             }
@@ -108,9 +107,10 @@ public partial class TooltipHandler
             // 0: action name
             // 13: action description
 
-            if (plugin.Config.LanguageActionTooltipName == GameLanguage.Off) return;
-
-            AddActionNameTranslation(addon);
+            if ((plugin.Config.LanguageActionTooltipName != GameLanguage.Off) && !string.IsNullOrEmpty(actionNameTranslation))
+            {
+                AddActionNameTranslation(addon);
+            }
         }
     }
 

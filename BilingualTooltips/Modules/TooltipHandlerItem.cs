@@ -34,7 +34,6 @@ public partial class TooltipHandler
 
         Service.Log.Debug($"Hovered item: {itemId}");
         itemNameTranslation = SheetHelper.GetItemName(itemId, plugin.Config.LanguageItemTooltipName) ?? "";
-        if (string.IsNullOrEmpty(itemNameTranslation)) return false;
         itemDescTranslation = SheetHelper.GetItemDescription(itemId, plugin.Config.LanguageItemTooltipDescription) ?? "";
 
         SetupItemTooltipPanel(itemId);
@@ -95,7 +94,7 @@ public partial class TooltipHandler
         var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[26];
         if (UpdateItemTooltipData())
         {
-            if (plugin.Config.LanguageItemTooltipDescription != GameLanguage.Off)
+            if ((plugin.Config.LanguageItemTooltipDescription != GameLanguage.Off) && !string.IsNullOrEmpty(itemDescTranslation))
             {
                 AddItemDescriptionTranslation(addon, stringArrayData);
             }
@@ -114,9 +113,10 @@ public partial class TooltipHandler
             // var normalName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[0]));
             // var glamName = MemoryHelper.ReadSeStringNullTerminated(new nint(stringArrayData->StringArray[1]));
 
-            if (plugin.Config.LanguageItemTooltipName == GameLanguage.Off) return;
-
-            AddItemNameTranslation(addon);
+            if ((plugin.Config.LanguageItemTooltipName != GameLanguage.Off) && !string.IsNullOrEmpty(itemNameTranslation))
+            {
+                AddItemNameTranslation(addon);
+            }
         }
     }
 
