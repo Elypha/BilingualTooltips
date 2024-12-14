@@ -32,8 +32,8 @@ public class BilingualTooltipsConfig : IMioConfig
     public GameLanguage LanguageItemTooltipDescription = GameLanguage.Japanese;
     public GameLanguage LanguageActionTooltipName = GameLanguage.Japanese;
     public GameLanguage LanguageActionTooltipDescription = GameLanguage.Japanese;
-    public GameLanguage ContentFinderName = GameLanguage.Japanese;
-    public GameLanguage ContentFinderDescription = GameLanguage.Japanese;
+    public GameLanguage ContentsFinderName = GameLanguage.Japanese;
+    public GameLanguage ContentsFinderDescription = GameLanguage.Japanese;
     public ushort ItemNameColourKey = 3;
     public ushort ItemDescriptionColourKey = 3;
     public ushort ActionNameColourKey = 3;

@@ -47,7 +47,7 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
 
     // MODULES
     public TooltipHandler TooltipHandler { get; set; } = null!;
-    public ContentHandler ContentHandler { get; set; } = null!;
+    public ContentHandler ContentsHandler { get; set; } = null!;
 
     // WINDOWS
     public ConfigWindow ConfigWindow { get; init; }
@@ -102,8 +102,8 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
 
         TooltipHandler = new TooltipHandler(this);
         TooltipHandler.StartHook();
-        ContentHandler = new ContentHandler(this);
-        ContentHandler.StartHook();
+        ContentsHandler = new ContentHandler(this);
+        ContentsHandler.StartHook();
 
 
         // WINDOWS
@@ -134,8 +134,8 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         // unload modules
         TooltipHandler.StopHook();
         TooltipHandler.Dispose();
-        ContentHandler.StopHook();
-        ContentHandler.Dispose();
+        ContentsHandler.StopHook();
+        ContentsHandler.Dispose();
 
         // unload windows
         ConfigWindow.Dispose();

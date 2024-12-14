@@ -384,32 +384,32 @@ public class ConfigWindow : Window, IDisposable
 
 
 
-        // TABLE Content finder
-        ImGui.TextColored(Ui.ColourCyan, "Content finder");
+        // TABLE Contents finder
+        ImGui.TextColored(Ui.ColourCyan, "Contents finder");
         ImGuiComponents.HelpMarker(
-            "The language you want to display below all kinds of content finder window."
+            "The language you want to display below all kinds of contents finder window."
         );
 
-        ImGui.BeginChild("table DrawLanguageConfig Content finder", new Vector2(table_width, table_height * 2), false);
+        ImGui.BeginChild("table DrawLanguageConfig Contents finder", new Vector2(table_width, table_height * 2), false);
         ImGui.Columns(2);
         ImGui.SetColumnWidth(0, col_name_width);
         ImGui.SetColumnWidth(1, col_value_width);
 
-        // ContentFinderName
+        // ContentsFinderName
         ImGui.TextColored(Ui.ColourWhiteDim, "　Name");
         ImGui.NextColumn();
         ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.BeginCombo($"{suffix}ContentFinderName", P.Config.ContentFinderName.ToString()))
+        if (ImGui.BeginCombo($"{suffix}ContentsFinderName", P.Config.ContentsFinderName.ToString()))
         {
             foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
             {
-                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentFinderName))
+                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentsFinderName))
                 {
-                    P.Config.ContentFinderName = type;
+                    P.Config.ContentsFinderName = type;
                     P.Config.Save();
                     if (type == GameLanguage.Off)
                     {
-                        plugin.ContentHandler.ResetJournalDetail();
+                        plugin.ContentsHandler.ResetJournalDetail();
                     }
                 }
             }
@@ -417,17 +417,17 @@ public class ConfigWindow : Window, IDisposable
         }
         ImGui.NextColumn();
 
-        // ContentFinderDescription
+        // ContentsFinderDescription
         ImGui.TextColored(Ui.ColourWhiteDim, "　Description");
         ImGui.NextColumn();
         ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.BeginCombo($"{suffix}ContentFinderDescription", P.Config.ContentFinderDescription.ToString()))
+        if (ImGui.BeginCombo($"{suffix}ContentsFinderDescription", P.Config.ContentsFinderDescription.ToString()))
         {
             foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
             {
-                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentFinderDescription))
+                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentsFinderDescription))
                 {
-                    P.Config.ContentFinderDescription = type;
+                    P.Config.ContentsFinderDescription = type;
                     P.Config.Save();
                 }
             }
