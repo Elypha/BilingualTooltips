@@ -514,29 +514,29 @@ public class ConfigWindow : Window, IDisposable
         ImGuiComponents.HelpMarker("Default: -8.5");
         ImGui.NextColumn();
 
-        // OffsetGlamName
-        var OffsetGlamName = plugin.Config.OffsetGlamName;
-        ImGui.TextColored(Ui.ColourWhiteDim, "　Glamour name");
-        ImGui.NextColumn();
-        ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.InputFloat2($"{suffix}OffsetGlamName", ref OffsetGlamName))
-        {
-            plugin.Config.OffsetGlamName = OffsetGlamName;
-            plugin.Config.Save();
-        }
-        ImGui.NextColumn();
+        // // OffsetGlamName
+        // var OffsetGlamName = plugin.Config.OffsetGlamName;
+        // ImGui.TextColored(Ui.ColourWhiteDim, "　Glamour name");
+        // ImGui.NextColumn();
+        // ImGui.SetNextItemWidth(col_value_content_width);
+        // if (ImGui.InputFloat2($"{suffix}OffsetGlamName", ref OffsetGlamName))
+        // {
+        //     plugin.Config.OffsetGlamName = OffsetGlamName;
+        //     plugin.Config.Save();
+        // }
+        // ImGui.NextColumn();
 
 
-        // GlamNameFontSize
-        var GlamNameFontSize = plugin.Config.GlamNameFontSize;
-        ImGui.TextColored(Ui.ColourWhiteDim, "　Glamour name font size");
-        ImGui.NextColumn();
-        ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.InputFloat($"{suffix}GlamNameFontSize", ref GlamNameFontSize))
-        {
-            plugin.Config.GlamNameFontSize = GlamNameFontSize;
-            plugin.Config.Save();
-        }
+        // // GlamNameFontSize
+        // var GlamNameFontSize = plugin.Config.GlamNameFontSize;
+        // ImGui.TextColored(Ui.ColourWhiteDim, "　Glamour name font size");
+        // ImGui.NextColumn();
+        // ImGui.SetNextItemWidth(col_value_content_width);
+        // if (ImGui.InputFloat($"{suffix}GlamNameFontSize", ref GlamNameFontSize))
+        // {
+        //     plugin.Config.GlamNameFontSize = GlamNameFontSize;
+        //     plugin.Config.Save();
+        // }
 
 
         ImGui.Columns(1);
