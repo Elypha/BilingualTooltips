@@ -57,6 +57,8 @@ public partial class ContentHandler
             ResetJournalDetail();
 
             ContentNameTranslation = SheetHelper.GetContentName(originalName, plugin.Config.ContentsFinderName) ?? "";
+            if (ContentNameTranslation.StartsWith("the ")) ContentNameTranslation = "The " + ContentNameTranslation[4..];
+
             AddJournalDetailNameTranslation(addon);
         }
     }

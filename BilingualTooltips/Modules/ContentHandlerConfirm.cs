@@ -57,6 +57,8 @@ public partial class ContentHandler
             ResetContentConfirm();
 
             ContentNameTranslation = SheetHelper.GetContentName(originalName, plugin.Config.ContentsFinderName) ?? "";
+            if (ContentNameTranslation.StartsWith("the ")) ContentNameTranslation = "The " + ContentNameTranslation[4..];
+
             AddContentConfirmNameTranslation(addon);
         }
     }

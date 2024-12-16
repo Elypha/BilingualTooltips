@@ -15,6 +15,7 @@ using Dalamud.Game.Gui;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Collections;
 
 namespace BilingualTooltips.Modules;
 
@@ -239,10 +240,10 @@ public static class SheetHelper
 
         RowId = P.ClientLanguage switch
         {
-            Dalamud.Game.ClientLanguage.Japanese => SheetContentFinderConditionJa.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
-            Dalamud.Game.ClientLanguage.English => SheetContentFinderConditionEn.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
-            Dalamud.Game.ClientLanguage.German => SheetContentFinderConditionDe.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
-            Dalamud.Game.ClientLanguage.French => SheetContentFinderConditionFr.Where(x => x.Name.ToString() == name).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.Japanese => SheetContentFinderConditionJa.Where(x => string.Equals(x.Name.ToString(), name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.English => SheetContentFinderConditionEn.Where(x => string.Equals(x.Name.ToString(), name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.German => SheetContentFinderConditionDe.Where(x => string.Equals(x.Name.ToString(), name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault().RowId,
+            Dalamud.Game.ClientLanguage.French => SheetContentFinderConditionFr.Where(x => string.Equals(x.Name.ToString(), name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault().RowId,
             _ => 0,
         };
         if (RowId != 0) return ContentType.Duty;
