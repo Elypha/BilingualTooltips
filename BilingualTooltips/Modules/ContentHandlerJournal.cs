@@ -24,6 +24,8 @@ public partial class ContentHandler
     public string ContentNameTranslation = "";
     public string ContentDescTranslation = "";
 
+    uint parentAddonID = 0;
+
     public enum JournalDetailTextNode
     {
         Name = 38,
@@ -39,12 +41,14 @@ public partial class ContentHandler
         var addon = (AtkUnitBase*)args.Addon;
         if (!addon->IsVisible) return;
 
+        parentAddonID = addon->Id;
+
         UpdateJournalDetail();
     }
 
     public unsafe void UpdateJournalDetail()
     {
-        var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("JournalDetail");
+        var addon = GrabAddon();
         if (addon == null) return;
         // if (!addon->IsVisible) return;
 
@@ -65,7 +69,7 @@ public partial class ContentHandler
 
     public unsafe void ResetJournalDetail()
     {
-        var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("JournalDetail");
+        var addon = GrabAddon();
 
         // remove translation if it exists
         var nameTranslationNode = GetNodeByNodeId(addon, (int)JournalDetailTextNode.NameTranslated);
@@ -84,6 +88,22 @@ public partial class ContentHandler
         float x, y;
         name_node->GetPositionFloat(&x, &y);
         name_node->SetPositionFloat(x, 72);
+    }
+
+    private unsafe AtkUnitBase* GrabAddon()
+    {
+        // 3 is just some arbitrary numbi
+        // 1 because indexes start at 1
+        for (int journalDetailIndex = 1; journalDetailIndex < 3; journalDetailIndex++)
+        {
+            var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("JournalDetail", journalDetailIndex);
+            if (addon == null) continue;
+            if (addon->ParentId != parentAddonID) continue;
+
+            return addon;
+        }
+
+        return null;
     }
 
     private unsafe void AddJournalDetailNameTranslation(AtkUnitBase* addon)
