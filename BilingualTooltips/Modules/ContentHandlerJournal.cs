@@ -92,9 +92,8 @@ public partial class ContentHandler
 
     private unsafe AtkUnitBase* GrabAddon()
     {
-        // 3 is just some arbitrary numbi
-        // 1 because indexes start at 1
-        for (int journalDetailIndex = 1; journalDetailIndex < 3; journalDetailIndex++)
+        // indexes start at 1, 9 is an assumed max n of JournalDetail: pull/5
+        for (int journalDetailIndex = 1; journalDetailIndex < 9; journalDetailIndex++)
         {
             var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("JournalDetail", journalDetailIndex);
             if (addon == null) continue;
