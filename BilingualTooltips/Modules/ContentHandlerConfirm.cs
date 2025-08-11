@@ -36,7 +36,7 @@ public partial class ContentHandler
         // if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
         if (!plugin.Config.Enabled) return;
 
-        var addon = (AtkUnitBase*)args.Addon;
+        var addon = (AtkUnitBase*)args.Addon.Address;
         if (!addon->IsVisible) return;
 
         UpdateContentConfirmDetail();
@@ -44,7 +44,7 @@ public partial class ContentHandler
 
     public unsafe void UpdateContentConfirmDetail()
     {
-        var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("ContentsFinderConfirm");
+        var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("ContentsFinderConfirm").Address;
         if (addon == null) return;
         // if (!addon->IsVisible) return;
 
@@ -65,7 +65,7 @@ public partial class ContentHandler
 
     public unsafe void ResetContentConfirm()
     {
-        var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("ContentsFinderConfirm");
+        var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("ContentsFinderConfirm").Address;
 
         // remove translation if it exists
         var nameTranslationNode = GetNodeByNodeId(addon, (int)ContentConfirmTextNode.NameTranslated);
@@ -127,8 +127,8 @@ public partial class ContentHandler
             translationNode->AlignmentFontType = 0x00;
             translationNode->AlignmentType = AlignmentType.Center;
             translationNode->FontSize = 14;
-            translationNode->TextFlags = (byte)((TextFlags)baseTextNode->TextFlags | TextFlags.MultiLine | TextFlags.AutoAdjustNodeSize);
-            translationNode->TextFlags2 = 0;
+            translationNode->TextFlags = baseTextNode->TextFlags | TextFlags.MultiLine | TextFlags.AutoAdjustNodeSize;
+            // translationNode->TextFlags2 = 0;
 
             var prev = insertNode->PrevSiblingNode;
             translationNode->AtkResNode.ParentNode = insertNode->ParentNode;

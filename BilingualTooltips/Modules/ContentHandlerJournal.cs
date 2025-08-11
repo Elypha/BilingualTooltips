@@ -38,7 +38,7 @@ public partial class ContentHandler
         // if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
         if (!plugin.Config.Enabled) return;
 
-        var addon = (AtkUnitBase*)args.Addon;
+        var addon = (AtkUnitBase*)args.Addon.Address;
         if (!addon->IsVisible) return;
 
         parentAddonID = addon->Id;
@@ -95,7 +95,7 @@ public partial class ContentHandler
         // indexes start at 1, 9 is an assumed max n of JournalDetail: pull/5
         for (int journalDetailIndex = 1; journalDetailIndex < 9; journalDetailIndex++)
         {
-            var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("JournalDetail", journalDetailIndex);
+            var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("JournalDetail", journalDetailIndex).Address;
             if (addon == null) continue;
             if (addon->ParentId != parentAddonID) continue;
 
@@ -146,8 +146,8 @@ public partial class ContentHandler
             translationNode->AlignmentFontType = 0x00;
             translationNode->AlignmentType = AlignmentType.Center;
             translationNode->FontSize = 14;
-            translationNode->TextFlags = (byte)((TextFlags)baseTextNode->TextFlags | TextFlags.MultiLine | TextFlags.AutoAdjustNodeSize);
-            translationNode->TextFlags2 = 0;
+            translationNode->TextFlags = baseTextNode->TextFlags | TextFlags.MultiLine | TextFlags.AutoAdjustNodeSize;
+            // translationNode->TextFlags2 = 0;
 
             var prev = insertNode->PrevSiblingNode;
             translationNode->AtkResNode.ParentNode = insertNode->ParentNode;

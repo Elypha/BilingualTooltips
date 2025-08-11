@@ -55,7 +55,7 @@ public partial class TooltipHandler
     public unsafe void ResetActionTooltip()
     {
         var addon = Service.GameGui.GetAddonByName("ActionDetail");
-        var addonPtr = (AtkUnitBase*)addon;
+        var addonPtr = (AtkUnitBase*)addon.Address;
 
         // remove translation if it exists
         var customNode = GetNodeByNodeId(addonPtr, (int)ActionDescriptionNode.NameTranslated);
@@ -81,7 +81,7 @@ public partial class TooltipHandler
         if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
         if (!plugin.Config.Enabled) return;
 
-        var addon = (AtkUnitBase*)args.Addon;
+        var addon = (AtkUnitBase*)args.Addon.Address;
         if (!addon->IsVisible) return;
 
         if (plugin.Config.LanguageActionTooltipName != GameLanguage.Off) ResetActionTooltip();
@@ -155,8 +155,8 @@ public partial class TooltipHandler
             textNode->LineSpacing = 18;
             textNode->AlignmentFontType = 0x00;
             textNode->FontSize = 12;
-            textNode->TextFlags = (byte)((TextFlags)baseTextNode->TextFlags | TextFlags.MultiLine | TextFlags.AutoAdjustNodeSize);
-            textNode->TextFlags2 = 0;
+            textNode->TextFlags = baseTextNode->TextFlags | TextFlags.MultiLine | TextFlags.AutoAdjustNodeSize;
+            // textNode->TextFlags2 = 0;
 
             var prev = insertNode->PrevSiblingNode;
             textNode->AtkResNode.ParentNode = insertNode->ParentNode;

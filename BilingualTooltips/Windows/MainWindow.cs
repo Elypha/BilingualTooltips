@@ -15,7 +15,7 @@ using System.Text.RegularExpressions;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Components;
 using Dalamud.Interface;
-using ImGuiNET;
+using Dalamud.Bindings.ImGui;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
