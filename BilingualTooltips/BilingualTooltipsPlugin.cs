@@ -147,6 +147,8 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         Service.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
         Service.PluginInterface.UiBuilder.OpenMainUi -= DrawMainUI;
         Service.Framework.Update -= OnFrameUpdate;
+
+        MiosukeHelper.Dispose();
     }
 
     public void DrawUI()
