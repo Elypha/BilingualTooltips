@@ -15,50 +15,61 @@ using Dalamud.Game.Gui;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using Miosuke;
+using BilingualTooltips.Modules;
 
 
-namespace BilingualTooltips.Modules;
+namespace BilingualTooltips.Addons;
 
-public partial class TooltipHandler
+public class ActionDetailAddon
 {
-    public string actionNameTranslation = "";
-    public string actionDescTranslation = "";
+    private BilingualTooltipsPlugin plugin;
 
-
-    private bool UpdateActionTooltipData()
+    public ActionDetailAddon(BilingualTooltipsPlugin plugin)
     {
-        var hover = Service.GameGui.HoveredAction;
-        if (hover.ActionID == 0) return false;
+        this.plugin = plugin;
+    }
 
+    public void Dispose()
+    {
+        ResetActionNameTextNode();
+    }
+
+
+    private string actionNameTranslation = "";
+    private string actionDescTranslation = "";
+    private bool UpdateTranslations()
+    {
+        // get id
+        var action = Service.GameGui.HoveredAction;
+        if (action.ActionID == 0) return false;
+
+        // update translations
+        actionNameTranslation = SheetHelper.GetActionName(action, plugin.Config.LanguageActionTooltipName) ?? "";
+        actionDescTranslation = SheetHelper.GetActionDescription(action, plugin.Config.LanguageActionTooltipDescription) ?? "";
         var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.Value.Abbreviation.ToString();
 
-        actionNameTranslation = SheetHelper.GetActionName(hover, plugin.Config.LanguageActionTooltipName) ?? "";
-        actionDescTranslation = SheetHelper.GetActionDescription(hover, plugin.Config.LanguageActionTooltipDescription) ?? "";
-
-        SetupActionTooltipPanel(hover);
+        // update translations on the panel
+        P.ItemTooltipPanel.NameJa = SheetHelper.GetActionName(action, GameLanguage.Japanese)!;
+        P.ItemTooltipPanel.NameEn = SheetHelper.GetActionName(action, GameLanguage.English)!;
+        P.ItemTooltipPanel.NameDe = SheetHelper.GetActionName(action, GameLanguage.German)!;
+        P.ItemTooltipPanel.NameFr = SheetHelper.GetActionName(action, GameLanguage.French)!;
+        P.ItemTooltipPanel.DescJa = SheetHelper.GetActionDescription(action, GameLanguage.Japanese)!;
+        P.ItemTooltipPanel.DescEn = SheetHelper.GetActionDescription(action, GameLanguage.English)!;
+        P.ItemTooltipPanel.DescDe = SheetHelper.GetActionDescription(action, GameLanguage.German)!;
+        P.ItemTooltipPanel.DescFr = SheetHelper.GetActionDescription(action, GameLanguage.French)!;
 
         return true;
     }
 
-    private void SetupActionTooltipPanel(HoveredAction hover)
-    {
-        P.ItemTooltipPanel.NameJa = SheetHelper.GetActionName(hover, GameLanguage.Japanese)!;
-        P.ItemTooltipPanel.NameEn = SheetHelper.GetActionName(hover, GameLanguage.English)!;
-        P.ItemTooltipPanel.NameDe = SheetHelper.GetActionName(hover, GameLanguage.German)!;
-        P.ItemTooltipPanel.NameFr = SheetHelper.GetActionName(hover, GameLanguage.French)!;
-        P.ItemTooltipPanel.DescJa = SheetHelper.GetActionDescription(hover, GameLanguage.Japanese)!;
-        P.ItemTooltipPanel.DescEn = SheetHelper.GetActionDescription(hover, GameLanguage.English)!;
-        P.ItemTooltipPanel.DescDe = SheetHelper.GetActionDescription(hover, GameLanguage.German)!;
-        P.ItemTooltipPanel.DescFr = SheetHelper.GetActionDescription(hover, GameLanguage.French)!;
-    }
 
-    public unsafe void ResetActionTooltip()
+    public unsafe void ResetActionNameTextNode()
     {
-        var addon = Service.GameGui.GetAddonByName("ActionDetail");
+        var addon = Service.GameGui.GetAddonByName(AddonHelper.ActionDetail.Name);
         var addonPtr = (AtkUnitBase*)addon.Address;
 
         // remove translation if it exists
-        var customNode = GetNodeByNodeId(addonPtr, (int)ActionDescriptionNode.NameTranslated);
+        var customNode = AddonHelper.GetNodeByNodeId(addonPtr, AddonHelper.ActionDetail.TextNodeId.NameTranslation);
         if (customNode != null)
         {
             if (customNode->AtkResNode.IsVisible())
@@ -69,14 +80,14 @@ public partial class TooltipHandler
             }
         }
 
-        // reset original item name position
-        var name_node = addonPtr->GetTextNodeById((uint)ActionDescriptionNode.Name);
+        // reset original name position
+        var name_node = addonPtr->GetTextNodeById(AddonHelper.ActionDetail.TextNodeId.Name);
         float x, y;
         name_node->GetPositionFloat(&x, &y);
         name_node->SetPositionFloat(x, 14);
     }
 
-    private unsafe void ActionDetail_PreRequestedUpdate_Handler(AddonEvent type, AddonArgs args)
+    public unsafe void PreRequestedUpdateHandler(AddonEvent type, AddonArgs args)
     {
         if (args is not AddonRequestedUpdateArgs requestedUpdateArgs) return;
         if (!plugin.Config.Enabled) return;
@@ -84,28 +95,20 @@ public partial class TooltipHandler
         var addon = (AtkUnitBase*)args.Addon.Address;
         if (!addon->IsVisible) return;
 
-        if (plugin.Config.LanguageActionTooltipName != GameLanguage.Off) ResetActionTooltip();
+        // reset before updating
+        if (plugin.Config.LanguageActionTooltipName != GameLanguage.Off) ResetActionNameTextNode();
+
+        // skip if enable on hotkey only
         if (plugin.Config.TemporaryEnableOnly && !Hotkey.IsActive(plugin.Config.TemporaryEnableHotkey)) return;
 
-        var numberArrayData = ((NumberArrayData**)requestedUpdateArgs.NumberArrayData)[31];
-        var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[28];
-        if (UpdateActionTooltipData())
+        var numberArrayData = ((NumberArrayData**)requestedUpdateArgs.NumberArrayData)[AddonHelper.ActionDetail.NumberArrayIndex.Self];
+        var stringArrayData = ((StringArrayData**)requestedUpdateArgs.StringArrayData)[AddonHelper.ActionDetail.StringArrayIndex.Self];
+        if (UpdateTranslations())
         {
             if ((plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off) && !string.IsNullOrEmpty(actionDescTranslation))
             {
                 AddActionDescriptionTranslation(addon, stringArrayData);
             }
-
-            // dump
-            // for (var i = 0; i < stringArrayData->Size; i++)
-            // {
-            //     var addr = new nint(stringArrayData->StringArray[i]);
-            //     var seString = MemoryHelper.ReadSeStringNullTerminated(addr);
-            //     Service.Log.Info($"{addon->NameString} str{i}: {seString.ToJson()}");
-            // }
-            // LUT
-            // 0: action name
-            // 13: action description
 
             if ((plugin.Config.LanguageActionTooltipName != GameLanguage.Off) && !string.IsNullOrEmpty(actionNameTranslation))
             {
@@ -117,60 +120,17 @@ public partial class TooltipHandler
 
     private unsafe void AddActionNameTranslation(AtkUnitBase* addon)
     {
-        var textNode = GetNodeByNodeId(addon, (int)ActionDescriptionNode.NameTranslated);
-        if (textNode != null) textNode->AtkResNode.ToggleVisibility(false);
+        var baseTextNode = addon->GetTextNodeById(AddonHelper.ActionDetail.TextNodeId.Name);
+        if (baseTextNode == null) return;
 
         var insertNode = addon->GetNodeById(2);
         if (insertNode == null) return;
 
-        var baseTextNode = addon->GetTextNodeById((uint)ActionDescriptionNode.Name);
-        if (baseTextNode == null) return;
-
+        var textNode = AddonHelper.GetNodeByNodeId(addon, AddonHelper.ActionDetail.TextNodeId.NameTranslation);
         if (textNode == null)
         {
-            textNode = IMemorySpace.GetUISpace()->Create<AtkTextNode>();
-            if (textNode == null) return;
-            textNode->AtkResNode.Type = NodeType.Text;
-            textNode->AtkResNode.NodeId = (int)ActionDescriptionNode.NameTranslated;
-
-
-            textNode->AtkResNode.NodeFlags = NodeFlags.AnchorLeft | NodeFlags.AnchorTop;
-            textNode->AtkResNode.DrawFlags = 0;
-
-            textNode->AtkResNode.Color.A = baseTextNode->AtkResNode.Color.A;
-            textNode->AtkResNode.Color.R = baseTextNode->AtkResNode.Color.R;
-            textNode->AtkResNode.Color.G = baseTextNode->AtkResNode.Color.G;
-            textNode->AtkResNode.Color.B = baseTextNode->AtkResNode.Color.B;
-
-            textNode->TextColor.A = baseTextNode->TextColor.A;
-            textNode->TextColor.R = baseTextNode->TextColor.R;
-            textNode->TextColor.G = baseTextNode->TextColor.G;
-            textNode->TextColor.B = baseTextNode->TextColor.B;
-
-            textNode->EdgeColor.A = baseTextNode->EdgeColor.A;
-            textNode->EdgeColor.R = baseTextNode->EdgeColor.R;
-            textNode->EdgeColor.G = baseTextNode->EdgeColor.G;
-            textNode->EdgeColor.B = baseTextNode->EdgeColor.B;
-
-            textNode->LineSpacing = 18;
-            textNode->AlignmentFontType = 0x00;
-            textNode->FontSize = 12;
-            textNode->TextFlags = baseTextNode->TextFlags | TextFlags.MultiLine | TextFlags.AutoAdjustNodeSize;
-            // textNode->TextFlags2 = 0;
-
-            var prev = insertNode->PrevSiblingNode;
-            textNode->AtkResNode.ParentNode = insertNode->ParentNode;
-
-            insertNode->PrevSiblingNode = (AtkResNode*)textNode;
-
-            if (prev != null) prev->NextSiblingNode = (AtkResNode*)textNode;
-
-            textNode->AtkResNode.PrevSiblingNode = prev;
-            textNode->AtkResNode.NextSiblingNode = insertNode;
-
-            addon->UldManager.UpdateDrawNodeList();
+            AddonHelper.SetupTextNode(addon, baseTextNode, insertNode, AddonHelper.ActionDetail.TextNodeId.NameTranslation);
         }
-
         textNode->AtkResNode.ToggleVisibility(true);
 
         var lines = new SeString();
@@ -182,19 +142,20 @@ public partial class TooltipHandler
         textNode->ResizeNodeForCurrentText();
         textNode->SetWidth(300);
         textNode->SetHeight(21);
-        var itemNameNode = addon->GetTextNodeById((uint)ActionDescriptionNode.Name);
+
+        var itemNameNode = addon->GetTextNodeById(AddonHelper.ActionDetail.TextNodeId.Name);
+
         var textNodeOffset = plugin.Config.OffsetActionNameTranslation;
         textNode->AtkResNode.SetPositionFloat(itemNameNode->AtkResNode.X, itemNameNode->AtkResNode.Y + textNodeOffset);
 
         var itemNameOffset = plugin.Config.OffsetActionNameOriginal;
         itemNameNode->SetPositionFloat(itemNameNode->AtkResNode.X, itemNameNode->AtkResNode.Y + itemNameOffset);
-
     }
 
 
     private unsafe void AddActionDescriptionTranslation(AtkUnitBase* addon, StringArrayData* stringArrayData)
     {
-        var descriptionNode = addon->GetTextNodeById((uint)ActionDescriptionNode.Description);
+        var descriptionNode = addon->GetTextNodeById(AddonHelper.ActionDetail.TextNodeId.Description);
         if (descriptionNode == null) return;
 
         var insertNode = addon->GetNodeById(2);

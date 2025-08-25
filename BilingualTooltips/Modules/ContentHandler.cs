@@ -46,18 +46,4 @@ public partial class ContentHandler
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PostRefresh, "ContentsFinder", ContentsFinderHandler);
         Service.AddonLifecycle.UnregisterListener(AddonEvent.PostSetup, "ContentsFinderConfirm", ContentsFinderConfirmHandler);
     }
-
-
-    private unsafe AtkTextNode* GetNodeByNodeId(AtkUnitBase* addon, int nodeId)
-    {
-        AtkTextNode* customNode = null;
-        for (var i = 0; i < addon->UldManager.NodeListCount; i++)
-        {
-            var node = addon->UldManager.NodeList[i];
-            if (node == null || node->NodeId != nodeId)
-                continue;
-            return (AtkTextNode*)node;
-        }
-        return null;
-    }
 }

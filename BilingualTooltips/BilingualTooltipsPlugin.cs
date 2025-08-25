@@ -132,7 +132,6 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         Service.Commands.RemoveHandler(CommandMainWindow);
 
         // unload modules
-        TooltipHandler.StopHook();
         TooltipHandler.Dispose();
         ContentsHandler.StopHook();
         ContentsHandler.Dispose();
@@ -236,8 +235,8 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         {
             if (Config.Enabled)
             {
-                TooltipHandler.ResetItemTooltip();
-                TooltipHandler.ResetActionTooltip();
+                TooltipHandler.itemDetailAddon.ResetItemNameTextNode();
+                TooltipHandler.actionDetailAddon.ResetActionNameTextNode();
             }
             Config.Enabled = !Config.Enabled;
         }
@@ -246,8 +245,8 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
             if (Config.Enabled == (bool)target) return;
             if (Config.Enabled && !(bool)target)
             {
-                TooltipHandler.ResetItemTooltip();
-                TooltipHandler.ResetActionTooltip();
+                TooltipHandler.itemDetailAddon.ResetItemNameTextNode();
+                TooltipHandler.actionDetailAddon.ResetActionNameTextNode();
             }
             Config.Enabled = (bool)target;
         }

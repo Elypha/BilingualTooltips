@@ -22,7 +22,7 @@ public class BilingualTooltipsConfig : IMioConfig
     public bool ItemTooltipPanelHotkeyEnabled = false;
     public bool ItemTooltipPanelHotkeyOpenWindow = true;
     public bool ItemTooltipPanelUpdateOnHotkey = true;
-    public VirtualKey[] ItemTooltipPanelHotkey = [VirtualKey.CONTROL, VirtualKey.B];
+    public VirtualKey[] ItemTooltipPanelHotkey = [VirtualKey.CONTROL, VirtualKey.MENU, VirtualKey.L];
     public GameLanguage ItemTooltipPanelText1 = GameLanguage.Japanese;
     public GameLanguage ItemTooltipPanelText2 = GameLanguage.English;
     public GameLanguage ItemTooltipPanelText3 = GameLanguage.German;

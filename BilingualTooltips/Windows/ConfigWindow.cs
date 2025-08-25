@@ -102,8 +102,8 @@ public class ConfigWindow : Window, IDisposable
         {
             if (TemporaryEnableOnly)
             {
-                plugin.TooltipHandler.ResetItemTooltip();
-                plugin.TooltipHandler.ResetActionTooltip();
+                plugin.TooltipHandler.itemDetailAddon.ResetItemNameTextNode();
+                plugin.TooltipHandler.actionDetailAddon.ResetActionNameTextNode();
             }
 
             plugin.Config.TemporaryEnableOnly = TemporaryEnableOnly;
@@ -164,7 +164,7 @@ public class ConfigWindow : Window, IDisposable
                     plugin.Config.Save();
                     if (type == GameLanguage.Off)
                     {
-                        plugin.TooltipHandler.ResetItemTooltip();
+                        plugin.TooltipHandler.itemDetailAddon.ResetItemNameTextNode();
                     }
                 }
             }
@@ -220,7 +220,7 @@ public class ConfigWindow : Window, IDisposable
                     plugin.Config.Save();
                     if (type == GameLanguage.Off)
                     {
-                        plugin.TooltipHandler.ResetActionTooltip();
+                        plugin.TooltipHandler.actionDetailAddon.ResetActionNameTextNode();
                     }
                 }
             }
