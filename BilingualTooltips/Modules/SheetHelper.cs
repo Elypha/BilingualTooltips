@@ -57,6 +57,18 @@ public static class SheetHelper
     public static ExcelSheet<Item> SheetItemDe = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.German);
     public static ExcelSheet<Item> SheetItemFr = Service.Data.GetExcelSheet<Item>(Dalamud.Game.ClientLanguage.French);
 
+    // EventItem
+    public static ExcelSheet<EventItem> SheetEventItemJa = Service.Data.GetExcelSheet<EventItem>(Dalamud.Game.ClientLanguage.Japanese);
+    public static ExcelSheet<EventItem> SheetEventItemEn = Service.Data.GetExcelSheet<EventItem>(Dalamud.Game.ClientLanguage.English);
+    public static ExcelSheet<EventItem> SheetEventItemDe = Service.Data.GetExcelSheet<EventItem>(Dalamud.Game.ClientLanguage.German);
+    public static ExcelSheet<EventItem> SheetEventItemFr = Service.Data.GetExcelSheet<EventItem>(Dalamud.Game.ClientLanguage.French);
+
+    // EventItemHelp
+    public static ExcelSheet<EventItemHelp> SheetEventItemHelpJa = Service.Data.GetExcelSheet<EventItemHelp>(Dalamud.Game.ClientLanguage.Japanese);
+    public static ExcelSheet<EventItemHelp> SheetEventItemHelpEn = Service.Data.GetExcelSheet<EventItemHelp>(Dalamud.Game.ClientLanguage.English);
+    public static ExcelSheet<EventItemHelp> SheetEventItemHelpDe = Service.Data.GetExcelSheet<EventItemHelp>(Dalamud.Game.ClientLanguage.German);
+    public static ExcelSheet<EventItemHelp> SheetEventItemHelpFr = Service.Data.GetExcelSheet<EventItemHelp>(Dalamud.Game.ClientLanguage.French);
+
     // ContentFinder
     public static ExcelSheet<ContentFinderCondition> SheetContentFinderConditionJa = Service.Data.GetExcelSheet<ContentFinderCondition>(Dalamud.Game.ClientLanguage.Japanese);
     public static ExcelSheet<ContentFinderCondition> SheetContentFinderConditionEn = Service.Data.GetExcelSheet<ContentFinderCondition>(Dalamud.Game.ClientLanguage.English);
@@ -172,26 +184,52 @@ public static class SheetHelper
     public static string? GetItemName(ulong id, GameLanguage lang)
     {
         var rowId = GetRealItemId(id);
-        return lang switch
+        var type = GetItemType(rowId);
+        return type switch
         {
-            GameLanguage.Japanese => SheetItemJa.GetRow(rowId).Name.ExtractText(),
-            GameLanguage.English => SheetItemEn.GetRow(rowId).Name.ExtractText(),
-            GameLanguage.German => SheetItemDe.GetRow(rowId).Name.ExtractText(),
-            GameLanguage.French => SheetItemFr.GetRow(rowId).Name.ExtractText(),
-            _ => null,
+            ItemType.Item => lang switch
+            {
+                GameLanguage.Japanese => SheetItemJa.GetRow(rowId).Name.ExtractText(),
+                GameLanguage.English => SheetItemEn.GetRow(rowId).Name.ExtractText(),
+                GameLanguage.German => SheetItemDe.GetRow(rowId).Name.ExtractText(),
+                GameLanguage.French => SheetItemFr.GetRow(rowId).Name.ExtractText(),
+                _ => throw new System.NotImplementedException(),
+            },
+            ItemType.EventItem => lang switch
+            {
+                GameLanguage.Japanese => SheetEventItemJa.GetRow(rowId).Name.ExtractText(),
+                GameLanguage.English => SheetEventItemEn.GetRow(rowId).Name.ExtractText(),
+                GameLanguage.German => SheetEventItemDe.GetRow(rowId).Name.ExtractText(),
+                GameLanguage.French => SheetEventItemFr.GetRow(rowId).Name.ExtractText(),
+                _ => throw new System.NotImplementedException(),
+            },
+            _ => throw new System.NotImplementedException(),
         };
     }
 
     public static string? GetItemDescription(ulong id, GameLanguage lang)
     {
         var rowId = GetRealItemId(id);
-        return lang switch
+        var type = GetItemType(rowId);
+        return type switch
         {
-            GameLanguage.Japanese => SheetItemJa.GetRow(rowId).Description.ExtractText(),
-            GameLanguage.English => SheetItemEn.GetRow(rowId).Description.ExtractText(),
-            GameLanguage.German => SheetItemDe.GetRow(rowId).Description.ExtractText(),
-            GameLanguage.French => SheetItemFr.GetRow(rowId).Description.ExtractText(),
-            _ => null,
+            ItemType.Item => lang switch
+            {
+                GameLanguage.Japanese => SheetItemJa.GetRow(rowId).Description.ExtractText(),
+                GameLanguage.English => SheetItemEn.GetRow(rowId).Description.ExtractText(),
+                GameLanguage.German => SheetItemDe.GetRow(rowId).Description.ExtractText(),
+                GameLanguage.French => SheetItemFr.GetRow(rowId).Description.ExtractText(),
+                _ => throw new System.NotImplementedException(),
+            },
+            ItemType.EventItem => lang switch
+            {
+                GameLanguage.Japanese => SheetEventItemHelpJa.GetRow(rowId).Description.ExtractText(),
+                GameLanguage.English => SheetEventItemHelpEn.GetRow(rowId).Description.ExtractText(),
+                GameLanguage.German => SheetEventItemHelpDe.GetRow(rowId).Description.ExtractText(),
+                GameLanguage.French => SheetEventItemHelpFr.GetRow(rowId).Description.ExtractText(),
+                _ => throw new System.NotImplementedException(),
+            },
+            _ => throw new System.NotImplementedException(),
         };
     }
 
@@ -261,5 +299,25 @@ public static class SheetHelper
         Service.Log.Debug($"Unknown content name: {name}");
 
         return ContentType.Unknown;
+    }
+
+    public enum ItemType
+    {
+        Unknown,
+        Item,
+        EventItem,
+    }
+
+    public static ItemType GetItemType(ulong id)
+    {
+        if (0 <= id && id <= 99999)
+        {
+            return ItemType.Item;
+        }
+        else if (2000000 <= id && id <= 2999999)
+        {
+            return ItemType.EventItem;
+        }
+        return ItemType.Unknown;
     }
 }

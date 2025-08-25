@@ -78,7 +78,7 @@ public unsafe static class AddonHelper
         return null;
     }
 
-    public unsafe static void SetupTextNode(AtkUnitBase* addon, AtkTextNode* baseTextNode, AtkResNode* insertNode, uint textNodeId, byte lineSpacing = 18, byte fontSize = 12)
+    public unsafe static void SetupTextNodeTooltip(AtkUnitBase* addon, AtkTextNode* baseTextNode, AtkResNode* insertNode, uint textNodeId, byte lineSpacing = 18, byte fontSize = 12)
     {
         var textNode = IMemorySpace.GetUISpace()->Create<AtkTextNode>();
         if (textNode == null) return;

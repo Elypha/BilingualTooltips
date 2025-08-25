@@ -129,7 +129,7 @@ public class ItemDetailAddon
         var textNode = AddonHelper.GetNodeByNodeId(addon, AddonHelper.ItemDetail.TextNodeId.NameTranslation);
         if (textNode == null)
         {
-            AddonHelper.SetupTextNode(addon, baseTextNode, insertNode, AddonHelper.ItemDetail.TextNodeId.NameTranslation);
+            AddonHelper.SetupTextNodeTooltip(addon, baseTextNode, insertNode, AddonHelper.ItemDetail.TextNodeId.NameTranslation);
         }
         textNode->AtkResNode.ToggleVisibility(true);
 

@@ -129,7 +129,7 @@ public class ActionDetailAddon
         var textNode = AddonHelper.GetNodeByNodeId(addon, AddonHelper.ActionDetail.TextNodeId.NameTranslation);
         if (textNode == null)
         {
-            AddonHelper.SetupTextNode(addon, baseTextNode, insertNode, AddonHelper.ActionDetail.TextNodeId.NameTranslation);
+            AddonHelper.SetupTextNodeTooltip(addon, baseTextNode, insertNode, AddonHelper.ActionDetail.TextNodeId.NameTranslation);
         }
         textNode->AtkResNode.ToggleVisibility(true);
 
@@ -161,7 +161,7 @@ public class ActionDetailAddon
         var insertNode = addon->GetNodeById(2);
         if (insertNode == null) return;
 
-        var addr = new nint(stringArrayData->StringArray[13]);
+        var addr = new nint(stringArrayData->StringArray[AddonHelper.ActionDetail.StringArrayIndex.Description]);
         var currentText = MemoryHelper.ReadSeStringNullTerminated(addr);
 
         if (currentText.Payloads.Count >= 1 && currentText.Payloads[0] is UIForegroundPayload foregroundPayload && foregroundPayload.ColorKey == plugin.Config.ActionDescriptionColourKey)
@@ -172,6 +172,6 @@ public class ActionDetailAddon
         currentText.Payloads.Insert(1, new TextPayload($"{actionDescTranslation}\n\n"));
         currentText.Payloads.Insert(2, new UIForegroundPayload(0));
 
-        stringArrayData->SetValue(13, currentText.Encode(), false, true, true);
+        stringArrayData->SetValue(AddonHelper.ActionDetail.StringArrayIndex.Description, currentText.Encode(), false, true, true);
     }
 }
