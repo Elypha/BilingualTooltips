@@ -68,7 +68,7 @@ public partial class ContentHandler
         var addon = (AtkUnitBase*)Service.GameGui.GetAddonByName("ContentsFinderConfirm").Address;
 
         // remove translation if it exists
-        var nameTranslationNode = AddonHelper.GetNodeByNodeId(addon, (int)ContentConfirmTextNode.NameTranslated);
+        var nameTranslationNode = AddonHelper.GetTextNodeById(addon, (int)ContentConfirmTextNode.NameTranslated);
         if (nameTranslationNode != null)
         {
             if (nameTranslationNode->AtkResNode.IsVisible())
@@ -88,7 +88,7 @@ public partial class ContentHandler
 
     private unsafe void AddContentConfirmNameTranslation(AtkUnitBase* addon)
     {
-        var translationNode = AddonHelper.GetNodeByNodeId(addon, (int)ContentConfirmTextNode.NameTranslated);
+        var translationNode = AddonHelper.GetTextNodeById(addon, (int)ContentConfirmTextNode.NameTranslated);
         if (translationNode != null) translationNode->AtkResNode.ToggleVisibility(false);
 
         var insertNode = addon->GetNodeById(2);

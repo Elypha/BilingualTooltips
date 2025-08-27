@@ -65,7 +65,7 @@ public unsafe static class AddonHelper
     }
 
 
-    public unsafe static AtkTextNode* GetNodeByNodeId(AtkUnitBase* addon, int nodeId)
+    public unsafe static AtkTextNode* GetTextNodeById(AtkUnitBase* addon, int nodeId)
     {
         AtkTextNode* customNode = null;
         for (var i = 0; i < addon->UldManager.NodeListCount; i++)
@@ -78,10 +78,10 @@ public unsafe static class AddonHelper
         return null;
     }
 
-    public unsafe static void SetupTextNodeTooltip(AtkUnitBase* addon, AtkTextNode* baseTextNode, AtkResNode* insertNode, uint textNodeId, byte lineSpacing = 18, byte fontSize = 12)
+    public unsafe static AtkTextNode* SetupTextNodeTooltip(AtkUnitBase* addon, AtkTextNode* baseTextNode, AtkResNode* insertNode, uint textNodeId, byte lineSpacing = 18, byte fontSize = 12)
     {
         var textNode = IMemorySpace.GetUISpace()->Create<AtkTextNode>();
-        if (textNode == null) return;
+        if (textNode == null) return null;
         textNode->AtkResNode.Type = NodeType.Text;
         textNode->AtkResNode.NodeId = textNodeId;
 
@@ -121,5 +121,43 @@ public unsafe static class AddonHelper
         textNode->AtkResNode.NextSiblingNode = insertNode;
 
         addon->UldManager.UpdateDrawNodeList();
+
+        return textNode;
+    }
+
+    public static unsafe void ResetTooltipNameTextNode(string addonName, uint nameNodeId, int nameTranslationNodeId, bool dispose = false)
+    {
+        var addon = Service.GameGui.GetAddonByName(addonName);
+        var addonPtr = (AtkUnitBase*)addon.Address;
+        if (addonPtr == null) return;
+
+        // remove translation if it exists
+        var customNode = AddonHelper.GetTextNodeById(addonPtr, nameTranslationNodeId);
+        if (customNode != null)
+        {
+            // hide the node if plugin is still enabled
+            if (customNode->AtkResNode.IsVisible())
+            {
+                var insertNode = addonPtr->GetNodeById(2);
+                if (insertNode == null) return;
+                customNode->AtkResNode.ToggleVisibility(false);
+            }
+            // dispose the node on-demand when plugin unloads
+            if (dispose)
+            {
+                if (customNode->AtkResNode.PrevSiblingNode != null)
+                    customNode->AtkResNode.PrevSiblingNode->NextSiblingNode = customNode->AtkResNode.NextSiblingNode;
+                if (customNode->AtkResNode.NextSiblingNode != null)
+                    customNode->AtkResNode.NextSiblingNode->PrevSiblingNode = customNode->AtkResNode.PrevSiblingNode;
+                addonPtr->UldManager.UpdateDrawNodeList();
+                customNode->AtkResNode.Destroy(true);
+            }
+        }
+
+        // reset original name position
+        var name_node = addonPtr->GetTextNodeById(nameNodeId);
+        float x, y;
+        name_node->GetPositionFloat(&x, &y);
+        name_node->SetPositionFloat(x, 14);
     }
 }

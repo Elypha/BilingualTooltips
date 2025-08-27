@@ -1,21 +1,21 @@
-using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Dalamud.Game.Addon.Lifecycle;
+using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
+using Dalamud.Game.Gui;
 using Dalamud.Game.Gui.Toast;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Game.Text.SeStringHandling;
+using Dalamud.Game.Text.SeStringHandling.Payloads;
 using Dalamud.Interface.Utility;
 using Dalamud.Memory;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel.Sheets;
 using Lumina.Excel;
-using Miosuke.Action;
+using Lumina.Excel.Sheets;
 using Miosuke;
-using Dalamud.Game.Gui;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text.RegularExpressions;
-using System.Collections;
+using Miosuke.Action;
 
 namespace BilingualTooltips.Modules;
 
@@ -81,22 +81,15 @@ public static class SheetHelper
     public static ExcelSheet<ContentRoulette> SheetContentRouletteDe = Service.Data.GetExcelSheet<ContentRoulette>(Dalamud.Game.ClientLanguage.German);
     public static ExcelSheet<ContentRoulette> SheetContentRouletteFr = Service.Data.GetExcelSheet<ContentRoulette>(Dalamud.Game.ClientLanguage.French);
 
-    public static string? GetActionName(HoveredAction action, GameLanguage lang)
+    public static string GetActionName(HoveredAction action, GameLanguage lang)
     {
-        try
+        var type = action.ActionKind;
+        var id = type switch
         {
-            var type = action.ActionKind;
-            var id = type switch
-            {
-                HoverActionKind.GeneralAction => action.BaseActionID,
-                _ => action.ActionID,
-            };
-            return GetActionName(id, type, lang);
-        }
-        catch (System.NotImplementedException)
-        {
-            return null;
-        }
+            HoverActionKind.GeneralAction => action.BaseActionID,
+            _ => action.ActionID,
+        };
+        return GetActionName(id, type, lang);
     }
 
     public static string GetActionName(uint id, HoverActionKind type, GameLanguage lang)
@@ -109,7 +102,7 @@ public static class SheetHelper
                 GameLanguage.English => SheetActionNameEn.GetRow(id).Name.ExtractText(),
                 GameLanguage.German => SheetActionNameDe.GetRow(id).Name.ExtractText(),
                 GameLanguage.French => SheetActionNameFr.GetRow(id).Name.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
             HoverActionKind.GeneralAction => lang switch
             {
@@ -117,7 +110,7 @@ public static class SheetHelper
                 GameLanguage.English => SheeGeneralActiontNameEn.GetRow(id).Name.ExtractText(),
                 GameLanguage.German => SheeGeneralActiontNameDe.GetRow(id).Name.ExtractText(),
                 GameLanguage.French => SheeGeneralActiontNameFr.GetRow(id).Name.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
             HoverActionKind.Trait => lang switch
             {
@@ -125,28 +118,21 @@ public static class SheetHelper
                 GameLanguage.English => SheetTraitNameEn.GetRow(id).Name.ExtractText(),
                 GameLanguage.German => SheetTraitNameDe.GetRow(id).Name.ExtractText(),
                 GameLanguage.French => SheetTraitNameFr.GetRow(id).Name.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
-            _ => throw new System.NotImplementedException(),
+            _ => throw new NotImplementedException(),
         };
     }
 
-    public static string? GetActionDescription(HoveredAction action, GameLanguage lang)
+    public static string GetActionDescription(HoveredAction action, GameLanguage lang)
     {
-        try
+        var type = action.ActionKind;
+        var id = type switch
         {
-            var type = action.ActionKind;
-            var id = type switch
-            {
-                HoverActionKind.GeneralAction => action.BaseActionID,
-                _ => action.ActionID,
-            };
-            return GetActionDescription(id, type, lang);
-        }
-        catch (System.NotImplementedException)
-        {
-            return null;
-        }
+            HoverActionKind.GeneralAction => action.BaseActionID,
+            _ => action.ActionID,
+        };
+        return GetActionDescription(id, type, lang);
     }
 
     public static string GetActionDescription(uint id, HoverActionKind type, GameLanguage lang)
@@ -159,7 +145,7 @@ public static class SheetHelper
                 GameLanguage.English => SheetActionTransientDescEn.GetRow(id).Description.ExtractText(),
                 GameLanguage.German => SheetActionTransientDescDe.GetRow(id).Description.ExtractText(),
                 GameLanguage.French => SheetActionTransientDescFr.GetRow(id).Description.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
             HoverActionKind.GeneralAction => lang switch
             {
@@ -167,7 +153,7 @@ public static class SheetHelper
                 GameLanguage.English => SheetGeneralActionDescEn.GetRow(id).Description.ExtractText(),
                 GameLanguage.German => SheetGeneralActionDescDe.GetRow(id).Description.ExtractText(),
                 GameLanguage.French => SheetGeneralActionDescFr.GetRow(id).Description.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
             HoverActionKind.Trait => lang switch
             {
@@ -175,13 +161,13 @@ public static class SheetHelper
                 GameLanguage.English => SheetTraitTransientDescEn.GetRow(id).Description.ExtractText(),
                 GameLanguage.German => SheetTraitTransientDescDe.GetRow(id).Description.ExtractText(),
                 GameLanguage.French => SheetTraitTransientDescFr.GetRow(id).Description.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
-            _ => throw new System.NotImplementedException(),
+            _ => throw new NotImplementedException(),
         };
     }
 
-    public static string? GetItemName(ulong id, GameLanguage lang)
+    public static string GetItemName(ulong id, GameLanguage lang)
     {
         var rowId = GetRealItemId(id);
         var type = GetItemType(rowId);
@@ -193,7 +179,7 @@ public static class SheetHelper
                 GameLanguage.English => SheetItemEn.GetRow(rowId).Name.ExtractText(),
                 GameLanguage.German => SheetItemDe.GetRow(rowId).Name.ExtractText(),
                 GameLanguage.French => SheetItemFr.GetRow(rowId).Name.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
             ItemType.EventItem => lang switch
             {
@@ -201,13 +187,13 @@ public static class SheetHelper
                 GameLanguage.English => SheetEventItemEn.GetRow(rowId).Name.ExtractText(),
                 GameLanguage.German => SheetEventItemDe.GetRow(rowId).Name.ExtractText(),
                 GameLanguage.French => SheetEventItemFr.GetRow(rowId).Name.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
-            _ => throw new System.NotImplementedException(),
+            _ => throw new NotImplementedException(),
         };
     }
 
-    public static string? GetItemDescription(ulong id, GameLanguage lang)
+    public static string GetItemDescription(ulong id, GameLanguage lang)
     {
         var rowId = GetRealItemId(id);
         var type = GetItemType(rowId);
@@ -219,7 +205,7 @@ public static class SheetHelper
                 GameLanguage.English => SheetItemEn.GetRow(rowId).Description.ExtractText(),
                 GameLanguage.German => SheetItemDe.GetRow(rowId).Description.ExtractText(),
                 GameLanguage.French => SheetItemFr.GetRow(rowId).Description.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
             ItemType.EventItem => lang switch
             {
@@ -227,9 +213,9 @@ public static class SheetHelper
                 GameLanguage.English => SheetEventItemHelpEn.GetRow(rowId).Description.ExtractText(),
                 GameLanguage.German => SheetEventItemHelpDe.GetRow(rowId).Description.ExtractText(),
                 GameLanguage.French => SheetEventItemHelpFr.GetRow(rowId).Description.ExtractText(),
-                _ => throw new System.NotImplementedException(),
+                _ => throw new NotImplementedException(),
             },
-            _ => throw new System.NotImplementedException(),
+            _ => throw new NotImplementedException(),
         };
     }
 
