@@ -32,24 +32,32 @@ public class ActionDetailAddon
         var action = Service.GameGui.HoveredAction;
         if (action.ActionID == 0) return false;
 
-        // update translations
-        actionNameTranslation = plugin.Config.LanguageActionTooltipName != GameLanguage.Off ?
-            SheetHelper.GetActionName(action, plugin.Config.LanguageActionTooltipName) :
-            "";
-        actionDescTranslation = plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off ?
-            SheetHelper.GetActionDescription(action, plugin.Config.LanguageActionTooltipDescription) :
-            "";
-        var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.Value.Abbreviation.ToString();
+        try
+        {
+            // update translations
+            actionNameTranslation = plugin.Config.LanguageActionTooltipName != GameLanguage.Off ?
+                SheetHelper.GetActionName(action, plugin.Config.LanguageActionTooltipName) :
+                "";
+            actionDescTranslation = plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off ?
+                SheetHelper.GetActionDescription(action, plugin.Config.LanguageActionTooltipDescription) :
+                "";
+            var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.Value.Abbreviation.ToString();
 
-        // update translations on the panel
-        P.ItemTooltipPanel.NameJa = SheetHelper.GetActionName(action, GameLanguage.Japanese)!;
-        P.ItemTooltipPanel.NameEn = SheetHelper.GetActionName(action, GameLanguage.English)!;
-        P.ItemTooltipPanel.NameDe = SheetHelper.GetActionName(action, GameLanguage.German)!;
-        P.ItemTooltipPanel.NameFr = SheetHelper.GetActionName(action, GameLanguage.French)!;
-        P.ItemTooltipPanel.DescJa = SheetHelper.GetActionDescription(action, GameLanguage.Japanese)!;
-        P.ItemTooltipPanel.DescEn = SheetHelper.GetActionDescription(action, GameLanguage.English)!;
-        P.ItemTooltipPanel.DescDe = SheetHelper.GetActionDescription(action, GameLanguage.German)!;
-        P.ItemTooltipPanel.DescFr = SheetHelper.GetActionDescription(action, GameLanguage.French)!;
+            // update translations on the panel
+            P.ItemTooltipPanel.NameJa = SheetHelper.GetActionName(action, GameLanguage.Japanese)!;
+            P.ItemTooltipPanel.NameEn = SheetHelper.GetActionName(action, GameLanguage.English)!;
+            P.ItemTooltipPanel.NameDe = SheetHelper.GetActionName(action, GameLanguage.German)!;
+            P.ItemTooltipPanel.NameFr = SheetHelper.GetActionName(action, GameLanguage.French)!;
+            P.ItemTooltipPanel.DescJa = SheetHelper.GetActionDescription(action, GameLanguage.Japanese)!;
+            P.ItemTooltipPanel.DescEn = SheetHelper.GetActionDescription(action, GameLanguage.English)!;
+            P.ItemTooltipPanel.DescDe = SheetHelper.GetActionDescription(action, GameLanguage.German)!;
+            P.ItemTooltipPanel.DescFr = SheetHelper.GetActionDescription(action, GameLanguage.French)!;
+        }
+        catch (NotImplementedException)
+        {
+            // Service.Log.Verbose($"ActionDetailAddon: Action not implemented, ID={action.ActionID}, Kind={action.ActionKind}");
+            return false;
+        }
 
         return true;
     }
