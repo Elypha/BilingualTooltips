@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Dalamud.NET.Sdk/13.0.0">
+<Project Sdk="Dalamud.NET.Sdk/14.0.1">
 
   <PropertyGroup>
     <Title>BilingualTooltips</Title>
@@ -9,7 +9,7 @@
     <Version>1.4.3.0</Version>
     <LangVersion>latest</LangVersion>
     <Platforms>x64;AnyCPU</Platforms>
-    <TargetFramework>net9.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <PackageProjectUrl>https://github.com/Elypha/BilingualTooltips</PackageProjectUrl>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
   </PropertyGroup>
@@ -34,7 +34,7 @@
   </ProjectExtensions>
 
   <ItemGroup>
-    <PackageReference Include="System.Net.Http" Version="4.3.4" />
+    <!-- <PackageReference Include="System.Net.Http" Version="4.3.4" /> -->
     <ProjectReference Include="..\Miosuke\Miosuke\Miosuke.csproj" />
   </ItemGroup>
 </Project>
