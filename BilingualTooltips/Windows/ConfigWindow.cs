@@ -1,16 +1,5 @@
-﻿using Dalamud.Game.ClientState.Keys;
-using Dalamud.Game.Text;
-using Dalamud.Interface.Components;
-using Dalamud.Interface.Windowing;
-using Dalamud.Bindings.ImGui;
-using Lumina.Excel.Sheets;
-using System.Collections.Generic;
-using System.Linq;
-using Dalamud.Game;
-using System.Numerics;
-using Miosuke;
+﻿using Dalamud.Interface.Components;
 using Miosuke.UiHelper;
-using System;
 using Miosuke.Configuration;
 
 
@@ -78,9 +67,29 @@ public class ConfigWindow : Window, IDisposable
         float padding = 0.8f;
         string suffix;
 
-        if (ImGui.Button("Need Help?"))
+        if (ImGui.CollapsingHeader("Help and Support"))
         {
-            P.MainWindow.Toggle();
+            var github_issues_url = "https://github.com/Elypha/BilingualTooltips/issues";
+
+            ImGui.Text("Thanks for being interested in testing this niche plugin!");
+            ImGui.Text("Please let me know if you have any question or suggestion via:");
+
+            ImGui.Text("- Discord");
+            ImGui.Indent();
+            ImGui.Text("1) Official Dalamud Server:");
+            ImGui.SameLine();
+            Ui.TextUrlWithLabelButton("https://discord.com/invite/holdshift");
+            ImGui.Indent();
+            ImGui.Text("Goto: plugin-help-forum > Bilingual Tooltips");
+            ImGui.Unindent();
+            ImGui.Text("2) PM @elypha");
+            ImGui.Unindent();
+
+            ImGui.Text("- GitHub Issues (if you want to keep track of the progress)");
+            ImGui.Indent();
+            Ui.TextUrlWithLabelButton(github_issues_url);
+            ImGui.Text("A more detailed guide is available there as well.");
+            ImGui.Unindent();
         }
 
         // ----------------- General -----------------

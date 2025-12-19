@@ -1,26 +1,4 @@
-﻿using Dalamud.Game.ClientState.Keys;
-using Dalamud.Game.Text;
-using Dalamud.Game.Command;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Interface.GameFonts;
-using Dalamud.Interface.ManagedFontAtlas;
-using Dalamud.Interface.Style;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
-using Dalamud.Plugin;
-using Lumina.Excel.Sheets;
-using Lumina.Excel;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Dalamud.Interface.Internal;
-using Dalamud.Interface.Components;
-using Dalamud.Interface;
-using Dalamud.Bindings.ImGui;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System;
-using BilingualTooltips.Modules;
+﻿using Miosuke.UiHelper;
 
 
 namespace BilingualTooltips.Windows;
@@ -67,24 +45,28 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        ImGui.Text("Thanks for being interested in testing BilingualTooltips!");
-        ImGui.Text("Please let me know if you have any questions or suggestions via:");
+        var github_issues_url = "https://github.com/Elypha/BilingualTooltips/issues";
+
+        ImGui.Text("Thanks for being interested in testing this niche plugin!");
+        ImGui.Text("Please let me know if you have any question or suggestion via:");
 
         ImGui.Text("- Discord");
         ImGui.Indent();
-        ImGui.Text("1) Dalamud Server > plugin-help-forum > Bilingual Tooltips");
+        ImGui.Text("1) Official Dalamud Server:");
+        ImGui.SameLine();
+        Ui.TextUrlWithLabelButton("https://discord.com/invite/holdshift");
+        ImGui.Indent();
+        ImGui.Text("Goto: plugin-help-forum > Bilingual Tooltips");
+        ImGui.Unindent();
         ImGui.Text("2) PM @elypha");
         ImGui.Unindent();
 
         ImGui.Text("- GitHub Issues (if you want to keep track of the progress)");
         ImGui.Indent();
-        ImGui.Text("https://github.com/Elypha/BilingualTooltips/issues");
-        ImGui.SameLine();
-        if (ImGui.Button("Copy URL"))
-        {
-            ImGui.SetClipboardText("https://github.com/Elypha/BilingualTooltips/issues");
-        }
+        Ui.TextUrlWithLabelButton(github_issues_url);
+        ImGui.Text("A more detailed guide is available there as well.");
         ImGui.Unindent();
+
 
         if (ImGui.Button("Show Config?"))
         {
