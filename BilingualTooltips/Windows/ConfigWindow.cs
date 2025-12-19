@@ -78,6 +78,11 @@ public class ConfigWindow : Window, IDisposable
         float padding = 0.8f;
         string suffix;
 
+        if (ImGui.Button("Need Help?"))
+        {
+            P.MainWindow.Toggle();
+        }
+
         // ----------------- General -----------------
         // ImGui.SetCursorPosY(ImGui.GetCursorPosY() + (padding * ImGui.GetTextLineHeight()));
         suffix = $"###{BilingualTooltipsPlugin.Name}[General]";

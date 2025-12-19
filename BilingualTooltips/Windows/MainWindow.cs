@@ -67,23 +67,28 @@ public class MainWindow : Window, IDisposable
 
     public override void Draw()
     {
-        ImGui.Text("Thanks for being interested in testing BilingualTooltips.");
+        ImGui.Text("Thanks for being interested in testing BilingualTooltips!");
         ImGui.Text("Please let me know if you have any questions or suggestions via:");
-        ImGui.Text("- Dalamud Discord > plugin-help-forum");
-        ImGui.Text("- Discord PM: elypha");
 
-        if (ImGui.Button("Test"))
+        ImGui.Text("- Discord");
+        ImGui.Indent();
+        ImGui.Text("1) Dalamud Server > plugin-help-forum > Bilingual Tooltips");
+        ImGui.Text("2) PM @elypha");
+        ImGui.Unindent();
+
+        ImGui.Text("- GitHub Issues (if you want to keep track of the progress)");
+        ImGui.Indent();
+        ImGui.Text("https://github.com/Elypha/BilingualTooltips/issues");
+        ImGui.SameLine();
+        if (ImGui.Button("Copy URL"))
         {
-            DoTest();
+            ImGui.SetClipboardText("https://github.com/Elypha/BilingualTooltips/issues");
         }
-    }
+        ImGui.Unindent();
 
-    private void DoTest()
-    {
-        // SheetHelper.SheetItemJa.Where(x => x.RowId == 41760).ToList().ForEach(x => Service.Log.Debug(x.Name.ToString()));
-        var name = SheetHelper.GetItemName(41760, GameLanguage.Japanese);
-        Service.Log.Debug($"Name: {name}");
-        var desc = SheetHelper.GetItemDescription(41760, GameLanguage.Japanese);
-        Service.Log.Debug($"Desc: {desc}");
+        if (ImGui.Button("Show Config?"))
+        {
+            P.ConfigWindow.Toggle();
+        }
     }
 }
