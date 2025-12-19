@@ -41,7 +41,7 @@ public class ActionDetailAddon
             actionDescTranslation = plugin.Config.LanguageActionTooltipDescription != GameLanguage.Off ?
                 SheetHelper.GetActionDescription(action, plugin.Config.LanguageActionTooltipDescription) :
                 "";
-            var mnemonic = Service.ClientState.LocalPlayer?.ClassJob.Value.Abbreviation.ToString();
+            var mnemonic = Service.PlayerState.ClassJob.Value.Abbreviation.ToString();
 
             // update translations on the panel
             P.ItemTooltipPanel.NameJa = SheetHelper.GetActionName(action, GameLanguage.Japanese)!;
@@ -55,7 +55,7 @@ public class ActionDetailAddon
         }
         catch (NotImplementedException)
         {
-            // Service.Log.Verbose($"ActionDetailAddon: Action not implemented, ID={action.ActionID}, Kind={action.ActionKind}");
+            Service.Log.Verbose($"ActionDetailAddon: Action not implemented, ID={action.ActionID}, Kind={action.ActionKind}");
             return false;
         }
 
