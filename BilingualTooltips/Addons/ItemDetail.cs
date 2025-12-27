@@ -118,15 +118,21 @@ public class ItemDetailAddon
         }
         itemNameTranslationNode->AtkResNode.ToggleVisibility(true);
 
-        itemNameTranslationNode->SetWidth(300);
-        itemNameTranslationNode->SetHeight(21);
-
         var lines = new SeString();
         lines.Payloads.Add(new UIForegroundPayload((ushort)plugin.Config.ItemNameColourKey));
         lines.Payloads.Add(new TextPayload($"{itemNameTranslation}"));
         lines.Payloads.Add(new UIForegroundPayload(0));
+        itemNameTranslationNode->AtkResNode.SetScaleX(1f);
+        itemNameTranslationNode->SetWidth(1024);
         itemNameTranslationNode->SetText(lines.Encode());
         itemNameTranslationNode->ResizeNodeForCurrentText();
+
+        var ratioX = (float)itemNameTranslationNode->AtkResNode.Width / plugin.Config.TooltipNameMaxLineWidth;
+        if (ratioX > 1f)
+        {
+            itemNameTranslationNode->AtkResNode.SetScaleX(itemNameTranslationNode->AtkResNode.ScaleX / ratioX);
+            itemNameTranslationNode->SetWidth(plugin.Config.TooltipNameMaxLineWidth);
+        }
 
         // the order needs to be kept as their 'original' positions are read dynamically
         itemNameTranslationNode->AtkResNode.SetPositionFloat(itemNameNode->AtkResNode.X, itemNameNode->AtkResNode.Y + plugin.Config.OffsetItemNameTranslation);

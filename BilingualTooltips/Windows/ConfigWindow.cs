@@ -153,7 +153,8 @@ public class ConfigWindow : Window, IDisposable
         ImGui.TextColored(Ui.ColourAccentLightAlt, "Language");
         ImGui.Separator();
 
-        // TABLE Item tooltip
+        // Item Tooltip
+        // --------------------------------
         ImGui.TextColored(Ui.ColourCyan, "Item tooltip");
         ImGuiComponents.HelpMarker(
             "The language you want to display additionally on item tooltips."
@@ -208,7 +209,8 @@ public class ConfigWindow : Window, IDisposable
         ImGui.EndChild();
 
 
-        // TABLE Action tooltip
+        // Action Tooltip
+        // --------------------------------
         ImGui.TextColored(Ui.ColourCyan, "Action tooltip");
         ImGuiComponents.HelpMarker(
             "The language you want to display additionally on actions, traits (passive skills) and general actions (sprint, etc.).\n" +
@@ -264,7 +266,67 @@ public class ConfigWindow : Window, IDisposable
         ImGui.EndChild();
 
 
-        // TABLE Action tooltip
+        // Contents finder
+        // --------------------------------
+        ImGui.TextColored(Ui.ColourCyan, "Contents finder");
+        ImGuiComponents.HelpMarker(
+            "The language you want to display below all kinds of contents finder window."
+        );
+
+        ImGui.BeginChild("table DrawLanguageConfig Contents finder", new Vector2(table_width, table_height * 2), false);
+        ImGui.Columns(2);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
+
+        // ContentsFinderName
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Name");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ContentsFinderName", P.Config.ContentsFinderName.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentsFinderName))
+                {
+                    P.Config.ContentsFinderName = type;
+                    P.Config.Save();
+                    if (type == GameLanguage.Off)
+                    {
+                        plugin.ContentsHandler.ResetJournalDetail();
+                    }
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        // ContentsFinderDescription
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Description");
+        ImGuiComponents.HelpMarker(
+            "WIP (low priority)"
+        );
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.BeginCombo($"{suffix}ContentsFinderDescription", P.Config.ContentsFinderDescription.ToString()))
+        {
+            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
+            {
+                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentsFinderDescription))
+                {
+                    P.Config.ContentsFinderDescription = type;
+                    P.Config.Save();
+                }
+            }
+            ImGui.EndCombo();
+        }
+        ImGui.NextColumn();
+
+        ImGui.Columns(1);
+        ImGui.EndChild();
+
+
+        // Multilingual panel
+        // --------------------------------
         ImGui.TextColored(Ui.ColourCyan, "Multilingual panel");
         ImGuiComponents.HelpMarker(
             "A separate window where you can see multiple language variations of your choice in a configurable order at the same time."
@@ -398,65 +460,6 @@ public class ConfigWindow : Window, IDisposable
 
 
 
-        // TABLE Contents finder
-        ImGui.TextColored(Ui.ColourCyan, "Contents finder");
-        ImGuiComponents.HelpMarker(
-            "The language you want to display below all kinds of contents finder window."
-        );
-
-        ImGui.BeginChild("table DrawLanguageConfig Contents finder", new Vector2(table_width, table_height * 2), false);
-        ImGui.Columns(2);
-        ImGui.SetColumnWidth(0, col_name_width);
-        ImGui.SetColumnWidth(1, col_value_width);
-
-        // ContentsFinderName
-        ImGui.TextColored(Ui.ColourWhiteDim, "　Name");
-        ImGui.NextColumn();
-        ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.BeginCombo($"{suffix}ContentsFinderName", P.Config.ContentsFinderName.ToString()))
-        {
-            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
-            {
-                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentsFinderName))
-                {
-                    P.Config.ContentsFinderName = type;
-                    P.Config.Save();
-                    if (type == GameLanguage.Off)
-                    {
-                        plugin.ContentsHandler.ResetJournalDetail();
-                    }
-                }
-            }
-            ImGui.EndCombo();
-        }
-        ImGui.NextColumn();
-
-        // ContentsFinderDescription
-        ImGui.TextColored(Ui.ColourWhiteDim, "　Description");
-        ImGuiComponents.HelpMarker(
-            "WIP (low priority)"
-        );
-        ImGui.NextColumn();
-        ImGui.SetNextItemWidth(col_value_content_width);
-        if (ImGui.BeginCombo($"{suffix}ContentsFinderDescription", P.Config.ContentsFinderDescription.ToString()))
-        {
-            foreach (var type in Enum.GetValues(typeof(GameLanguage)).Cast<GameLanguage>())
-            {
-                if (ImGui.Selectable(type.ToString(), type == P.Config.ContentsFinderDescription))
-                {
-                    P.Config.ContentsFinderDescription = type;
-                    P.Config.Save();
-                }
-            }
-            ImGui.EndCombo();
-        }
-        ImGui.NextColumn();
-
-        ImGui.Columns(1);
-        ImGui.EndChild();
-
-
-
     }
 
 
@@ -565,13 +568,15 @@ public class ConfigWindow : Window, IDisposable
 
 
 
+        // Y offset
+        // --------------------------------
         ImGui.TextColored(Ui.ColourCyan, "Y offset");
         ImGuiComponents.HelpMarker(
             "Try a different offset to fit your favourite UI layout.\n" +
             "The updated position Y' = Y + offset.\n"
         );
 
-        ImGui.BeginChild("table DrawUiConfig Y offset", new Vector2(table_width, table_height * 7), false);
+        ImGui.BeginChild("table DrawUiConfig Y offset", new Vector2(table_width, table_height * 6), false);
         ImGui.Columns(2);
         ImGui.SetColumnWidth(0, col_name_width);
         ImGui.SetColumnWidth(1, col_value_width);
@@ -674,6 +679,33 @@ public class ConfigWindow : Window, IDisposable
         //     plugin.Config.Save();
         // }
 
+
+        ImGui.Columns(1);
+        ImGui.EndChild();
+
+
+
+        // Others
+        // --------------------------------
+        ImGui.TextColored(Ui.ColourCyan, "Others");
+
+        ImGui.BeginChild("table DrawUiConfig Others", new Vector2(table_width, table_height * 1), false);
+        ImGui.Columns(2);
+        ImGui.SetColumnWidth(0, col_name_width);
+        ImGui.SetColumnWidth(1, col_value_width);
+
+        // TooltipNameMaxLineWidth
+        var TooltipNameMaxLineWidth = plugin.Config.TooltipNameMaxLineWidth;
+        ImGui.TextColored(Ui.ColourWhiteDim, "　Name max width");
+        ImGui.NextColumn();
+        ImGui.SetNextItemWidth(col_value_content_width);
+        if (ImGui.InputUShort($"{suffix}TooltipNameMaxLineWidth", ref TooltipNameMaxLineWidth))
+        {
+            plugin.Config.TooltipNameMaxLineWidth = TooltipNameMaxLineWidth;
+            plugin.Config.Save();
+        }
+        ImGuiComponents.HelpMarker("The max width (px) for Item Names, Action Names, etc. Text wider than this will be 'compressed' horizontally to fit in one line, i.e., letters will become thinner.\nDefault: 300");
+        ImGui.NextColumn();
 
         ImGui.Columns(1);
         ImGui.EndChild();

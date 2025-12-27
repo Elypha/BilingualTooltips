@@ -119,15 +119,21 @@ public class ActionDetailAddon
         }
         actionNameTranslationNode->AtkResNode.ToggleVisibility(true);
 
-        actionNameTranslationNode->SetWidth(300);
-        actionNameTranslationNode->SetHeight(21);
-
         var lines = new SeString();
         lines.Payloads.Add(new UIForegroundPayload((ushort)plugin.Config.ActionNameColourKey));
         lines.Payloads.Add(new TextPayload($"{actionNameTranslation}"));
         lines.Payloads.Add(new UIForegroundPayload(0));
+        actionNameTranslationNode->AtkResNode.SetScaleX(1f);
+        actionNameTranslationNode->SetWidth(1024);
         actionNameTranslationNode->SetText(lines.Encode());
         actionNameTranslationNode->ResizeNodeForCurrentText();
+
+        var ratioX = (float)actionNameTranslationNode->AtkResNode.Width / plugin.Config.TooltipNameMaxLineWidth;
+        if (ratioX > 1f)
+        {
+            actionNameTranslationNode->AtkResNode.SetScaleX(actionNameTranslationNode->AtkResNode.ScaleX / ratioX);
+            actionNameTranslationNode->SetWidth(plugin.Config.TooltipNameMaxLineWidth);
+        }
 
         // the order needs to be kept as their 'original' positions are read dynamically
         actionNameTranslationNode->AtkResNode.SetPositionFloat(actionNameNode->AtkResNode.X, actionNameNode->AtkResNode.Y + plugin.Config.OffsetActionNameTranslation);

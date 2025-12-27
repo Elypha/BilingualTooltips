@@ -51,5 +51,7 @@ public class BilingualTooltipsConfig : IMioConfig
     public float OffsetContentNameOriginal = -1.5f;
     public float OffsetContentNameTranslation = 7.0f;
 
+    public ushort TooltipNameMaxLineWidth = 300;
+
     public string CustomTheme = "";
 }
