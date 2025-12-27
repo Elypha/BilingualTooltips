@@ -34,7 +34,6 @@
   </ProjectExtensions>
 
   <ItemGroup>
-    <!-- <PackageReference Include="System.Net.Http" Version="4.3.4" /> -->
     <ProjectReference Include="..\Miosuke\Miosuke\Miosuke.csproj" />
   </ItemGroup>
 </Project>
