@@ -30,7 +30,7 @@ public class ActionDetailAddon
     {
         // get id
         var action = Service.GameGui.HoveredAction;
-        if (action.ActionID == 0) return false;
+        if (action.ActionId == 0) return false;
 
         try
         {
@@ -55,7 +55,7 @@ public class ActionDetailAddon
         }
         catch (NotImplementedException)
         {
-            Service.Log.Verbose($"ActionDetailAddon: Action not implemented, ID={action.ActionID}, Kind={action.ActionKind}");
+            Service.Log.Verbose($"ActionDetailAddon: Action not implemented, ID={action.ActionId}, Kind={action.DetailKind}");
             return false;
         }
 

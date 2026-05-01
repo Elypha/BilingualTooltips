@@ -95,20 +95,20 @@ public static class SheetHelper
 
     public static string GetActionName(HoveredAction action, GameLanguage lang)
     {
-        var kind = action.ActionKind;
+        var kind = action.DetailKind;
         var id = kind switch
         {
-            HoverActionKind.GeneralAction => action.BaseActionID,
-            _ => action.ActionID,
+            DetailKind.GeneralAction => action.BaseActionId,
+            _ => action.ActionId,
         };
         return GetActionName(id, kind, lang);
     }
 
-    public static string GetActionName(uint id, HoverActionKind kind, GameLanguage lang)
+    public static string GetActionName(uint id, DetailKind kind, GameLanguage lang)
     {
         return kind switch
         {
-            HoverActionKind.Action => lang switch
+            DetailKind.Action => lang switch
             {
                 GameLanguage.Japanese => SheetActionNameJa.GetRow(id).Name.ExtractText(),
                 GameLanguage.English => SheetActionNameEn.GetRow(id).Name.ExtractText(),
@@ -116,7 +116,7 @@ public static class SheetHelper
                 GameLanguage.French => SheetActionNameFr.GetRow(id).Name.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.GeneralAction => lang switch
+            DetailKind.GeneralAction => lang switch
             {
                 GameLanguage.Japanese => SheeGeneralActiontNameJa.GetRow(id).Name.ExtractText(),
                 GameLanguage.English => SheeGeneralActiontNameEn.GetRow(id).Name.ExtractText(),
@@ -124,7 +124,7 @@ public static class SheetHelper
                 GameLanguage.French => SheeGeneralActiontNameFr.GetRow(id).Name.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.Trait => lang switch
+            DetailKind.Trait => lang switch
             {
                 GameLanguage.Japanese => SheetTraitNameJa.GetRow(id).Name.ExtractText(),
                 GameLanguage.English => SheetTraitNameEn.GetRow(id).Name.ExtractText(),
@@ -132,7 +132,7 @@ public static class SheetHelper
                 GameLanguage.French => SheetTraitNameFr.GetRow(id).Name.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.DeepDungeonItem => lang switch
+            DetailKind.DeepDungeonItem => lang switch
             {
                 GameLanguage.Japanese => SheetDeepDungeonItemJa.GetRow(id).Name.ExtractText(),
                 GameLanguage.English => SheetDeepDungeonItemEn.GetRow(id).Name.ExtractText(),
@@ -140,7 +140,7 @@ public static class SheetHelper
                 GameLanguage.French => SheetDeepDungeonItemFr.GetRow(id).Name.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.MainCommand => lang switch
+            DetailKind.MainCommand => lang switch
             {
                 GameLanguage.Japanese => SheetMainCommandJa.GetRow(id).Name.ExtractText(),
                 GameLanguage.English => SheetMainCommandEn.GetRow(id).Name.ExtractText(),
@@ -154,20 +154,20 @@ public static class SheetHelper
 
     public static string GetActionDescription(HoveredAction action, GameLanguage lang)
     {
-        var kind = action.ActionKind;
+        var kind = action.DetailKind;
         var id = kind switch
         {
-            HoverActionKind.GeneralAction => action.BaseActionID,
-            _ => action.ActionID,
+            DetailKind.GeneralAction => action.BaseActionId,
+            _ => action.ActionId,
         };
         return GetActionDescription(id, kind, lang);
     }
 
-    public static string GetActionDescription(uint id, HoverActionKind kind, GameLanguage lang)
+    public static string GetActionDescription(uint id, DetailKind kind, GameLanguage lang)
     {
         return kind switch
         {
-            HoverActionKind.Action => lang switch
+            DetailKind.Action => lang switch
             {
                 GameLanguage.Japanese => SheetActionTransientDescJa.GetRow(id).Description.ExtractText(),
                 GameLanguage.English => SheetActionTransientDescEn.GetRow(id).Description.ExtractText(),
@@ -175,7 +175,7 @@ public static class SheetHelper
                 GameLanguage.French => SheetActionTransientDescFr.GetRow(id).Description.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.GeneralAction => lang switch
+            DetailKind.GeneralAction => lang switch
             {
                 GameLanguage.Japanese => SheetGeneralActionDescJa.GetRow(id).Description.ExtractText(),
                 GameLanguage.English => SheetGeneralActionDescEn.GetRow(id).Description.ExtractText(),
@@ -183,7 +183,7 @@ public static class SheetHelper
                 GameLanguage.French => SheetGeneralActionDescFr.GetRow(id).Description.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.Trait => lang switch
+            DetailKind.Trait => lang switch
             {
                 GameLanguage.Japanese => SheetTraitTransientDescJa.GetRow(id).Description.ExtractText(),
                 GameLanguage.English => SheetTraitTransientDescEn.GetRow(id).Description.ExtractText(),
@@ -191,7 +191,7 @@ public static class SheetHelper
                 GameLanguage.French => SheetTraitTransientDescFr.GetRow(id).Description.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.DeepDungeonItem => lang switch
+            DetailKind.DeepDungeonItem => lang switch
             {
                 GameLanguage.Japanese => SheetDeepDungeonItemJa.GetRow(id).Tooltip.ExtractText(),
                 GameLanguage.English => SheetDeepDungeonItemEn.GetRow(id).Tooltip.ExtractText(),
@@ -199,7 +199,7 @@ public static class SheetHelper
                 GameLanguage.French => SheetDeepDungeonItemFr.GetRow(id).Tooltip.ExtractText(),
                 _ => throw new NotImplementedException(),
             },
-            HoverActionKind.MainCommand => lang switch
+            DetailKind.MainCommand => lang switch
             {
                 GameLanguage.Japanese => SheetMainCommandJa.GetRow(id).Description.ExtractText(),
                 GameLanguage.English => SheetMainCommandEn.GetRow(id).Description.ExtractText(),

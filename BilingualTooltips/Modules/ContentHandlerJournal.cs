@@ -15,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Dalamud.Game;
+using Dalamud.Utility;
 
 
 namespace BilingualTooltips.Modules;
@@ -54,7 +55,8 @@ public partial class ContentHandler
 
         var originalNamePtr = addon->GetTextNodeById((uint)JournalDetailTextNode.Name);
         if (originalNamePtr == null) return;
-        var originalName = MemoryHelper.ReadSeString(&originalNamePtr->NodeText).TextValue;
+        // var originalName = MemoryHelper.ReadSeString(&originalNamePtr->NodeText).TextValue;
+        var originalName = Utf8StringExtensions.AsReadOnlySeString(originalNamePtr->NodeText).ExtractText();
 
         if (plugin.Config.ContentsFinderName != GameLanguage.Off)
         {
