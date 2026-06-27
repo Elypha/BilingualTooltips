@@ -1,11 +1,10 @@
-﻿using Miosuke.UiHelper;
-
+using Miosuke.UiHelper;
 
 namespace BilingualTooltips.Windows;
 
-public class MainWindow : Window, IDisposable
+public sealed class MainWindow : Window, IDisposable
 {
-    private BilingualTooltipsPlugin plugin;
+    private readonly BilingualTooltipsPlugin _plugin;
 
     public MainWindow(BilingualTooltipsPlugin plugin) : base(
         "BilingualTooltips",
@@ -14,7 +13,7 @@ public class MainWindow : Window, IDisposable
         Size = new Vector2(720, 720);
         SizeCondition = ImGuiCond.FirstUseEver;
 
-        this.plugin = plugin;
+        _plugin = plugin;
     }
 
     public void Dispose()
@@ -27,25 +26,25 @@ public class MainWindow : Window, IDisposable
 
     public override void PreDraw()
     {
-        if (plugin.Config.EnableTheme)
+        if (_plugin.Config.EnableTheme)
         {
-            plugin.PluginTheme.Push();
-            plugin.PluginThemeEnabled = true;
+            _plugin.PluginTheme.Push();
+            _plugin.PluginThemeEnabled = true;
         }
     }
 
     public override void PostDraw()
     {
-        if (plugin.PluginThemeEnabled)
+        if (_plugin.PluginThemeEnabled)
         {
-            plugin.PluginTheme.Pop();
-            plugin.PluginThemeEnabled = false;
+            _plugin.PluginTheme.Pop();
+            _plugin.PluginThemeEnabled = false;
         }
     }
 
     public override void Draw()
     {
-        var github_issues_url = "https://github.com/Elypha/BilingualTooltips/issues";
+        var githubIssuesUrl = "https://github.com/Elypha/BilingualTooltips/issues";
 
         ImGui.Text("Thanks for being interested in testing this niche plugin!");
         ImGui.Text("Please let me know if you have any question or suggestion via:");
@@ -54,7 +53,7 @@ public class MainWindow : Window, IDisposable
         ImGui.Indent();
         ImGui.Text("1) Official Dalamud Server:");
         ImGui.SameLine();
-        Ui.TextUrlWithLabelButton("https://discord.com/invite/holdshift");
+        Ui.TextUrlWithInlineActionButtons("https://discord.com/invite/holdshift");
         ImGui.Indent();
         ImGui.Text("Goto: plugin-help-forum > Bilingual Tooltips");
         ImGui.Unindent();
@@ -63,14 +62,13 @@ public class MainWindow : Window, IDisposable
 
         ImGui.Text("- GitHub Issues (if you want to keep track of the progress)");
         ImGui.Indent();
-        Ui.TextUrlWithLabelButton(github_issues_url);
+        Ui.TextUrlWithInlineActionButtons(githubIssuesUrl);
         ImGui.Text("A more detailed guide is available there as well.");
         ImGui.Unindent();
 
-
         if (ImGui.Button("Show Config?"))
         {
-            P.ConfigWindow.Toggle();
+            _plugin.ConfigWindow.Toggle();
         }
     }
 }

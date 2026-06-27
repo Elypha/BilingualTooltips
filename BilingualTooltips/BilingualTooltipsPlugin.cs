@@ -1,123 +1,106 @@
-﻿#pragma warning disable CS8618
+#pragma warning disable CS8618
 
-using Dalamud.Game.Command;
-using Dalamud.Game.Text;
-using Dalamud.Game.Text.SeStringHandling;
-using Dalamud.Interface.GameFonts;
-using Dalamud.Interface.ManagedFontAtlas;
-using Dalamud.Interface.Style;
-using Dalamud.Interface.Windowing;
-using Dalamud.Plugin.Services;
-using Dalamud.Plugin;
-using Lumina.Excel.Sheets;
-using Dalamud.Game.Addon.Lifecycle;
-using Dalamud.Game.Addon.Lifecycle.AddonArgTypes;
-using Dalamud.Game.Text.SeStringHandling.Payloads;
-using Dalamud.Hooking;
-using Dalamud.Memory;
-using Miosuke.Action;
-using Miosuke.Messages;
-using Miosuke.Configuration;
-using Miosuke;
-using Dalamud.Utility.Signatures;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using Lumina.Excel;
-using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using BilingualTooltips.Configuration;
 using BilingualTooltips.Assets;
-using BilingualTooltips.Windows;
+using BilingualTooltips.Configuration;
 using BilingualTooltips.Modules;
-
+using BilingualTooltips.Modules.Dialogue;
+using BilingualTooltips.Modules.Lookup;
+using BilingualTooltips.Windows;
+using Dalamud.Game.ClientState.Keys;
+using Dalamud.Game.Command;
+using Dalamud.Interface.Style;
+using Dalamud.Plugin.Services;
+using Miosuke.Configuration;
+using Miosuke.Messages;
+using Miosuke.UserActions;
 
 namespace BilingualTooltips;
 
-public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
+public sealed class BilingualTooltipsPlugin : IDalamudPlugin
 {
     public static string Name => "BilingualTooltips";
     public static string NameShort => "BTT";
     private const string CommandMainWindow = "/btt";
 
-    // PLUGIN
+    // plugin state
+    // --------------------------------
     internal static BilingualTooltipsPlugin P;
     internal BilingualTooltipsConfig Config;
     public StyleModel PluginTheme { get; set; }
     public bool PluginThemeEnabled { get; set; }
     public Dalamud.Game.ClientLanguage ClientLanguage;
 
-    // MODULES
-    public TooltipHandler TooltipHandler { get; set; } = null!;
-    public ContentHandler ContentsHandler { get; set; } = null!;
+    // modules
+    // --------------------------------
+    public TooltipHandler TooltipHandler { get; set; }
+    public ContentsFinderHandler ContentsHandler { get; set; }
+    public CosmicMissionsHandler CosmicMissionsHandler { get; set; }
+    public DialogueStoreProvider DialogueStoreProvider { get; set; }
+    public DialogueHandler DialogueHandler { get; set; }
+    public BttLookupHistoryStore LookupHistory { get; set; }
+    public BttLookupResolver LookupResolver { get; set; }
 
-    // WINDOWS
+    // windows
+    // --------------------------------
     public ConfigWindow ConfigWindow { get; init; }
     public MainWindow MainWindow { get; init; }
-    public MultilingualPanel ItemTooltipPanel { get; init; }
+    public LookupHistoryWindow LookupHistoryWindow { get; init; }
+    public DialogueTranslationWindow DialogueTranslationWindow { get; init; }
     public WindowSystem WindowSystem = new("BilingualTooltips");
 
-
-
-
+    private bool _lookupHistoryHotkeyIdle = true;
+    private bool _dialogueOverlayHotkeyIdle = true;
 
     public BilingualTooltipsPlugin(IDalamudPluginInterface pluginInterface)
     {
-        // PLUGIN
-
-        // dalamud service
+        // services and configuration
+        // --------------------------------
         Service.Init(pluginInterface);
-        MiosukeHelper.Init(
-            pluginInterface,
-            this,
-            $"[{NameShort}] ",
-            null
-        );
-
-
-        // PLUGIN
-
-        // plugin init
+        MiosukeHelper.Init(pluginInterface, this, $"[{NameShort}] ", null);
         P = this;
-        // config init
-        MioConfig.Setup(MainConfigFileName: "main.json");
-        if (Service.PluginInterface.ConfigFile.Exists) MioConfig.Migrate<BilingualTooltipsConfig>(Service.PluginInterface.ConfigFile.FullName);
+
+        MioConfig.Setup(mainConfigFileName: "main.json");
         Config = MioConfig.Init<BilingualTooltipsConfig>();
         ClientLanguage = Service.ClientState.ClientLanguage;
 
-        // theme
         ImGuiThemeLoadCustomOrDefault();
 
-        // command handlers
         Service.Commands.AddHandler(CommandMainWindow, new CommandInfo(OnCommandMainWindow)
         {
             HelpMessage = "main command entry:\n" +
                 "└ /btt → open the main window.\n" +
                 "└ /btt c|config → open the configuration window.\n" +
-                "└ /btt enabled → toggle if plugin is enabled.\n" +
-                "└ /btt enabled true|false → set if plugin is enabled.\n" +
-                "└ /btt ml → the same function as the hotkey but in text command form."
+                "└ /btt ml|history → open the lookup history window.\n" +
+                "└ /btt dialogue → toggle the NPC dialogue translation window."
         });
 
-
-        // MODULES
-
+        // module startup
+        // --------------------------------
         TooltipHandler = new TooltipHandler(this);
         TooltipHandler.StartHook();
-        ContentsHandler = new ContentHandler(this);
+        ContentsHandler = new ContentsFinderHandler(this);
         ContentsHandler.StartHook();
+        CosmicMissionsHandler = new CosmicMissionsHandler(this);
+        CosmicMissionsHandler.StartHook();
+        DialogueStoreProvider = new DialogueStoreProvider(this);
+        DialogueHandler = new DialogueHandler(this);
+        LookupHistory = new BttLookupHistoryStore();
+        LookupResolver = new BttLookupResolver(this);
 
-
-        // WINDOWS
-
+        // windows
+        // --------------------------------
         ConfigWindow = new ConfigWindow(this);
         MainWindow = new MainWindow(this);
-        ItemTooltipPanel = new MultilingualPanel(this);
+        LookupHistoryWindow = new LookupHistoryWindow(this);
+        DialogueTranslationWindow = new DialogueTranslationWindow(this);
         WindowSystem.AddWindow(ConfigWindow);
         WindowSystem.AddWindow(MainWindow);
-        WindowSystem.AddWindow(ItemTooltipPanel);
+        WindowSystem.AddWindow(LookupHistoryWindow);
+        WindowSystem.AddWindow(DialogueTranslationWindow);
+        DialogueHandler.StartHook();
 
-
-        // HANDLERS
-
+        // framework hooks
+        // --------------------------------
         Service.PluginInterface.UiBuilder.Draw += DrawUI;
         Service.PluginInterface.UiBuilder.OpenConfigUi += DrawConfigUI;
         Service.PluginInterface.UiBuilder.OpenMainUi += DrawMainUI;
@@ -128,20 +111,26 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
     {
         WindowSystem.RemoveAllWindows();
 
-        // unload command handlers
+        // command handlers
         Service.Commands.RemoveHandler(CommandMainWindow);
 
-        // unload modules
+        // modules
         TooltipHandler.Dispose();
         ContentsHandler.StopHook();
         ContentsHandler.Dispose();
+        CosmicMissionsHandler.StopHook();
+        CosmicMissionsHandler.Dispose();
+        DialogueHandler.Dispose();
 
-        // unload windows
+        // windows
         ConfigWindow.Dispose();
         MainWindow.Dispose();
-        ItemTooltipPanel.Dispose();
+        LookupHistoryWindow.Dispose();
+        DialogueTranslationWindow.Dispose();
+        LookupHistory.Flush();
+        DialogueStoreProvider.Dispose();
 
-        // unload event handlers
+        // event handlers
         Service.PluginInterface.UiBuilder.Draw -= DrawUI;
         Service.PluginInterface.UiBuilder.OpenConfigUi -= DrawConfigUI;
         Service.PluginInterface.UiBuilder.OpenMainUi -= DrawMainUI;
@@ -165,26 +154,37 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
         ConfigWindow.Toggle();
     }
 
-    public static void ImGuiThemeLoadCustomOrDefault()
+    public void RecordLookup(BttLookupKey key, string displayName)
     {
+        if (!Config.LookupHistoryEnabled) return;
+
+        if (!Config.LookupHistorySources.HasFlag(SourceFor(key.Kind))) return;
+
+        LookupHistory.Record(key, displayName, Config.LookupHistoryLimit);
+    }
+
+    public static bool ImGuiThemeLoadCustomOrDefault()
+    {
+        var customTheme = P.Config.CustomTheme.Trim();
+        if (string.IsNullOrEmpty(customTheme))
+        {
+            P.PluginTheme = Data.DefaultTheme;
+            return true;
+        }
+
         try
         {
-            if (P.Config.CustomTheme != "")
-            {
-                var _theme = StyleModel.Deserialize(P.Config.CustomTheme);
-                if (_theme is not null) P.PluginTheme = _theme;
-                return;
-            }
+            P.PluginTheme = StyleModel.Deserialize(customTheme)
+                ?? throw new InvalidOperationException("Theme deserialised to null.");
+            return true;
         }
         catch (Exception e)
         {
             P.Config.CustomTheme = "";
             P.Config.Save();
-            Notice.Error($"Your custom theme is invalid and has been reset: {e.Message}");
-        }
-        finally
-        {
-            P.PluginTheme = Data.defaultTheme;
+            P.PluginTheme = Data.DefaultTheme;
+            Notice.Error($"Your theme override is invalid and has been reset to the bundled theme: {e.Message}");
+            return false;
         }
     }
 
@@ -198,19 +198,15 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
             case "config" or "c":
                 ConfigWindow.Toggle();
                 break;
-            case string arg1 when arg1.StartsWith("enabled"):
-                var arg2 = args[7..].Trim();
-                if (bool.TryParse(arg2, out var result))
-                {
-                    ToggleEnabled(result);
-                }
-                else
-                {
-                    ToggleEnabled();
-                }
+            case "ml" or "history":
+                LookupHistoryWindow.Toggle();
                 break;
-            case "ml":
-                ItemTooltipPanel.OnHotkeyTriggered();
+            case "dialogue" or "dialog":
+                if (Config.TalkDialogueOverlayEnabled)
+                {
+                    DialogueTranslationWindow.Toggle();
+                }
+
                 break;
             default:
                 Notice.Error("Invalid command argument.");
@@ -220,46 +216,53 @@ public sealed partial class BilingualTooltipsPlugin : IDalamudPlugin
 
     public void OnFrameUpdate(IFramework framework)
     {
-        if (!P.ItemTooltipPanel.IsIdle && !Hotkey.IsActive(Config.ItemTooltipPanelHotkey)) P.ItemTooltipPanel.IsIdle = true;
-        if (Hotkey.IsActive(Config.ItemTooltipPanelHotkey) && P.ItemTooltipPanel.IsIdle)
-        {
-            P.ItemTooltipPanel.OnHotkeyTriggered();
-            P.ItemTooltipPanel.IsIdle = false;
-        }
+        LookupHistory.FlushIfDue();
+        DialogueHandler.OnFrameUpdate();
 
+        ProcessShortcut(
+            Config.LookupHistoryHotkeyEnabled,
+            Config.LookupHistoryHotkey,
+            ref _lookupHistoryHotkeyIdle,
+            LookupHistoryWindow.OnHotkeyTriggered);
+        ProcessShortcut(
+            Config is
+            {
+                TalkDialogueEnabled: true,
+                TalkDialogueOverlayEnabled: true,
+                TalkDialogueOverlayShortcutEnabled: true
+            },
+            Config.TalkDialogueOverlayShortcutHotkey,
+            ref _dialogueOverlayHotkeyIdle,
+            () => DialogueTranslationWindow.IsOpen = !DialogueTranslationWindow.IsOpen);
     }
 
-    public void ToggleEnabled(bool? target = null)
+    private static void ProcessShortcut(bool enabled, VirtualKey[] hotkey, ref bool idle, Action trigger)
     {
-        if (target == null)
+        if (!enabled)
         {
-            if (Config.Enabled)
-            {
-                TooltipHandler.itemDetailAddon.ResetItemNameTextNode();
-                TooltipHandler.actionDetailAddon.ResetActionNameTextNode();
-            }
-            Config.Enabled = !Config.Enabled;
+            idle = true;
+            return;
         }
-        else
+
+        var active = Hotkey.IsActive(hotkey);
+        if (!idle && !active)
         {
-            if (Config.Enabled == (bool)target) return;
-            if (Config.Enabled && !(bool)target)
-            {
-                TooltipHandler.itemDetailAddon.ResetItemNameTextNode();
-                TooltipHandler.actionDetailAddon.ResetActionNameTextNode();
-            }
-            Config.Enabled = (bool)target;
+            idle = true;
         }
-        Config.Save();
+
+        if (active && idle)
+        {
+            trigger();
+            idle = false;
+        }
     }
 
-}
-
-public enum GameLanguage
-{
-    Japanese,
-    English,
-    German,
-    French,
-    Off,
+    private static BttLookupHistorySource SourceFor(BttLookupKind kind) => kind switch
+    {
+        BttLookupKind.Item => BttLookupHistorySource.Item,
+        BttLookupKind.Action => BttLookupHistorySource.Action,
+        BttLookupKind.Content => BttLookupHistorySource.Content,
+        BttLookupKind.NpcDialogue => BttLookupHistorySource.NpcDialogue,
+        _ => BttLookupHistorySource.None,
+    };
 }

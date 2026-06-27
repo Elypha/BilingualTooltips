@@ -1,57 +1,84 @@
-﻿using Dalamud.Configuration;
+using BilingualTooltips.Modules.Dialogue.Data;
+using BilingualTooltips.Modules.Lookup;
 using Dalamud.Game.ClientState.Keys;
-using Dalamud.Game.Text;
-using Dalamud.Plugin;
-using System.Collections.Generic;
-using System;
-using System.Numerics;
 using Miosuke.Configuration;
-
 
 namespace BilingualTooltips.Configuration;
 
 [Serializable]
 public class BilingualTooltipsConfig : IMioConfig
 {
+    // internal
+    // --------------------------------
     public int Version = 0;
+    public const int LookupHistoryLimitMin = 1;
+    public const int LookupHistoryLimitMax = 9999;
 
-    // ----------------- General -----------------
-    public bool Enabled = true;
-    public bool TemporaryEnableOnly = false;
-    public VirtualKey[] TemporaryEnableHotkey = [VirtualKey.CONTROL, VirtualKey.B];
-    public bool ItemTooltipPanelHotkeyEnabled = false;
-    public bool ItemTooltipPanelHotkeyOpenWindow = true;
-    public bool ItemTooltipPanelUpdateOnHotkey = true;
-    public VirtualKey[] ItemTooltipPanelHotkey = [VirtualKey.CONTROL, VirtualKey.MENU, VirtualKey.L];
-    public GameLanguage ItemTooltipPanelText1 = GameLanguage.Japanese;
-    public GameLanguage ItemTooltipPanelText2 = GameLanguage.English;
-    public GameLanguage ItemTooltipPanelText3 = GameLanguage.German;
-    public GameLanguage ItemTooltipPanelText4 = GameLanguage.French;
-    public GameLanguage LanguageItemTooltipName = GameLanguage.Japanese;
-    public GameLanguage LanguageItemTooltipDescription = GameLanguage.Japanese;
-    public GameLanguage LanguageActionTooltipName = GameLanguage.Japanese;
-    public GameLanguage LanguageActionTooltipDescription = GameLanguage.Japanese;
-    public GameLanguage ContentsFinderName = GameLanguage.Japanese;
-    public GameLanguage ContentsFinderDescription = GameLanguage.Japanese;
+    // general
+    // --------------------------------
+    public bool EnableTheme = true;
+    public string CustomTheme = "";
+
+    // history
+    // --------------------------------
+    public bool LookupHistoryEnabled = true;
+    public int LookupHistoryLimit = 2000;
+    public BttLookupHistorySource LookupHistorySources = BttLookupHistorySource.All;
+    public bool LookupHistoryHotkeyEnabled = false;
+    public VirtualKey[] LookupHistoryHotkey = [VirtualKey.CONTROL, VirtualKey.MENU, VirtualKey.H];
+    public bool LookupHistoryShowcaseEnabled = true;
+
+    // tooltips
+    // --------------------------------
+    public BttLanguage LanguageItemTooltipName = BttLanguage.Japanese;
+    public BttLanguage LanguageItemTooltipDescription = BttLanguage.Japanese;
+    public BttLanguage LanguageActionTooltipName = BttLanguage.Japanese;
+    public BttLanguage LanguageActionTooltipDescription = BttLanguage.Japanese;
+
+    public bool TooltipShortcutEnabled = false;
+    public VirtualKey[] TooltipShortcutHotkey = [VirtualKey.CONTROL, VirtualKey.MENU, VirtualKey.T];
 
     public int ItemNameColourKey = 3;
     public int ItemDescriptionColourKey = 3;
     public int ActionNameColourKey = 3;
     public int ActionDescriptionColourKey = 3;
-
-    public int ContentNameColourKey = 11;
-    public int ContentDescColourKey = 11;
-
-    public bool EnableTheme = false;
-
-    public float OffsetItemNameOriginal = 4.5f;
+    public float OffsetItemNameNative = 4.5f;
     public float OffsetItemNameTranslation = 2.0f;
-    public float OffsetActionNameOriginal = -1.0f;
-    public float OffsetActionNameTranslation = -8.5f;
-    public float OffsetContentNameOriginal = -1.5f;
-    public float OffsetContentNameTranslation = 7.0f;
-
+    public float OffsetActionNameNative = -0.5f;
+    public float OffsetActionNameTranslation = -8.0f;
     public ushort TooltipNameMaxLineWidth = 300;
 
-    public string CustomTheme = "";
+    // game ui
+    // --------------------------------
+    public BttLanguage GameUiNameLanguage = BttLanguage.Japanese;
+    public BttLanguage GameUiDescriptionLanguage = BttLanguage.Japanese;
+
+    public int GameUiNameColourKey = 11;
+    public int GameUiDescriptionColourKey = 11;
+    public float OffsetGameUiNameNative = -1.5f;
+    public float OffsetGameUiNameTranslation = 7.0f;
+
+    public BttLanguage CosmicMissionNameLanguage = BttLanguage.Japanese;
+    public int CosmicMissionNameColourKey = 10;
+    public float OffsetCosmicMissionNameNative = -1.5f;
+    public float OffsetCosmicMissionNameTranslation = 22.5f;
+
+    // npc dialogue
+    // --------------------------------
+    public string TalkDialogueVersionManifestUrl = "";
+    public string TalkDialogueDataPath = "";
+
+    public bool TalkDialogueEnabled = false;
+    public BttLanguage TalkDialogueInputLanguage = BttLanguage.Auto;
+    public BttLanguage TalkDialogueTargetLanguage = BttLanguage.Japanese;
+    public bool TalkDialogueOverlayShowSourceText = false;
+    public bool TalkDialogueOverlayShowMatchDetails = false;
+    public bool TalkDialogueOverlayEnabled = true;
+    public bool TalkDialogueOpenWindowAutomatically = true;
+    public bool TalkDialogueOverlayShortcutEnabled = false;
+    public VirtualKey[] TalkDialogueOverlayShortcutHotkey = [VirtualKey.CONTROL, VirtualKey.MENU, VirtualKey.D];
+
+    public string TalkDialogueRenderProfileFirstName = "";
+    public string TalkDialogueRenderProfileLastName = "";
+    public BttDialogueGender TalkDialogueRenderProfileGender = BttDialogueGender.Unspecified;
 }
