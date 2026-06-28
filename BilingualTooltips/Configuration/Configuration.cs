@@ -10,7 +10,8 @@ public class BilingualTooltipsConfig : IMioConfig
 {
     // internal
     // --------------------------------
-    public int Version = 0;
+    public const int CurrentVersion = 1;
+    public int Version = CurrentVersion;
     public const int LookupHistoryLimitMin = 1;
     public const int LookupHistoryLimitMax = 9999;
 

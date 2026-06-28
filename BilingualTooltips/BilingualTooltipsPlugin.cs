@@ -60,6 +60,7 @@ public sealed class BilingualTooltipsPlugin : IDalamudPlugin
         P = this;
 
         MioConfig.Setup(mainConfigFileName: "main.json");
+        BilingualTooltipsConfigMigrator.MigrateIfNeeded(MioConfig.MainConfigFile);
         Config = MioConfig.Init<BilingualTooltipsConfig>();
         ClientLanguage = Service.ClientState.ClientLanguage;
 
