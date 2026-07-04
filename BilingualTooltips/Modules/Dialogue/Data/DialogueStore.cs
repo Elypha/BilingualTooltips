@@ -98,7 +98,7 @@ public sealed class DialogueStore
         var matchShard = GetMatchShard(inputLanguage);
         var templateShard = GetTemplateShard(targetLanguage);
 
-        var normalised = DialogueText.NormaliseRenderedText(text);
+        var normalised = DialogueText.NormaliseMatchText(text);
         if (matchShard.TryExact(normalised, out var exactCandidates))
         {
             foreach (var entryId in exactCandidates)
