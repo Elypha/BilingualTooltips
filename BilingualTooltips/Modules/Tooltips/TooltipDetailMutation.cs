@@ -245,7 +245,13 @@ sealed unsafe class TooltipDetailMutation
             : windowBackground->Height;
         var descriptionY = descriptionNode->AtkResNode.Y;
         var descriptionScreenY = descriptionNode->AtkResNode.ScreenY;
-        var snapshot = new DescriptionLayoutSnapshot((nint)addon, descriptionY, windowHeight, windowBackgroundHeight);
+        var snapshot = new DescriptionLayoutSnapshot(
+            (nint)addon,
+            addon->Y,
+            addon->GetScaledHeight(true),
+            descriptionY,
+            windowHeight,
+            windowBackgroundHeight);
         var candidates = new List<nint>();
         var candidateAddresses = new HashSet<nint>();
 
@@ -299,6 +305,8 @@ sealed unsafe class TooltipDetailMutation
         {
             windowBackground->SetHeight((ushort)(snapshot.WindowBackgroundHeight.Value + heightDelta));
         }
+
+        ClampAddonBottomToViewport(addon, snapshot, heightDelta);
     }
 
     private static void RestoreDescriptionLayout(AtkUnitBase* addon, DescriptionLayoutSnapshot snapshot)
@@ -321,6 +329,8 @@ sealed unsafe class TooltipDetailMutation
         {
             windowBackground->SetHeight(snapshot.WindowBackgroundHeight.Value);
         }
+
+        addon->SetY(snapshot.AddonY);
     }
 
     private static AtkResNode* GetWindowBackground(AtkUnitBase* addon) =>
@@ -361,23 +371,54 @@ sealed unsafe class TooltipDetailMutation
             ? 0f
             : node->Height * MathF.Max(0f, node->ScaleY);
 
+    private static void ClampAddonBottomToViewport(
+        AtkUnitBase* addon,
+        DescriptionLayoutSnapshot snapshot,
+        ushort heightDelta)
+    {
+        var viewportHeight = ImGui.GetIO().DisplaySize.Y;
+        if (viewportHeight <= 0f) return;
+
+        var originalBottom = snapshot.AddonY + snapshot.AddonScaledHeight;
+        var currentBottom = addon->Y + addon->GetScaledHeight(true);
+        if (heightDelta > 0 && currentBottom <= originalBottom + DescriptionCaptureScreenYTolerance)
+        {
+            var addonScale = snapshot.WindowHeight is > 0
+                ? snapshot.AddonScaledHeight / snapshot.WindowHeight.Value
+                : MathF.Max(0f, addon->GetScale());
+            currentBottom = originalBottom + (heightDelta * MathF.Max(0f, addonScale));
+        }
+
+        var overflow = currentBottom - viewportHeight;
+        if (overflow <= 0f) return;
+
+        var adjustedY = snapshot.AddonY - (int)MathF.Ceiling(overflow);
+        addon->SetY((short)Math.Clamp(adjustedY, short.MinValue, short.MaxValue));
+    }
+
     private sealed record NameLayoutSnapshot(nint AddonAddress, float NativeNameY);
 
     private sealed class DescriptionLayoutSnapshot
     {
         public DescriptionLayoutSnapshot(
             nint addonAddress,
+            short addonY,
+            float addonScaledHeight,
             float descriptionY,
             ushort? windowHeight,
             ushort? windowBackgroundHeight)
         {
             AddonAddress = addonAddress;
+            AddonY = addonY;
+            AddonScaledHeight = addonScaledHeight;
             DescriptionY = descriptionY;
             WindowHeight = windowHeight;
             WindowBackgroundHeight = windowBackgroundHeight;
         }
 
         public nint AddonAddress { get; }
+        public short AddonY { get; }
+        public float AddonScaledHeight { get; }
         public float DescriptionY { get; }
         public ushort? WindowHeight { get; }
         public ushort? WindowBackgroundHeight { get; }
