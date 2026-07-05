@@ -247,7 +247,7 @@ sealed unsafe class TooltipDetailMutation
             ? (ushort?)null
             : windowBackground->Height;
         var descriptionY = descriptionNode->AtkResNode.Y;
-        var dividerScreenY = GetComputedScreenY((AtkResNode*)dividerSourceNode);
+        var captureBoundaryScreenY = GetComputedScreenY((AtkResNode*)dividerSourceNode);
         var snapshot = new DescriptionLayoutSnapshot(
             (nint)addon,
             addon->Y,
@@ -262,10 +262,14 @@ sealed unsafe class TooltipDetailMutation
         {
             var node = addon->UldManager.NodeList[i];
             if (node == null
-                || node == (AtkResNode*)dividerSourceNode
+                || ShouldSkipDescriptionCaptureNode(node, descriptionNode, dividerSourceNode)
                 || IsPluginNode(node)
-                || !node->IsVisible()
-                || GetComputedScreenY(node) + DescriptionCaptureScreenYTolerance < dividerScreenY)
+                || !node->IsVisible())
+            {
+                continue;
+            }
+
+            if (GetComputedScreenY(node) + DescriptionCaptureScreenYTolerance < captureBoundaryScreenY)
             {
                 continue;
             }
@@ -284,6 +288,25 @@ sealed unsafe class TooltipDetailMutation
         }
 
         return snapshot;
+    }
+
+    private static bool ShouldSkipDescriptionCaptureNode(AtkResNode* node, AtkTextNode* descriptionNode, AtkNineGridNode* dividerSourceNode) =>
+        node == (AtkResNode*)dividerSourceNode || IsDescriptionInsertionContainer(node, descriptionNode);
+
+    private static bool IsDescriptionInsertionContainer(AtkResNode* node, AtkTextNode* descriptionNode)
+    {
+        // Moving this container would also move the plugin-owned siblings inserted inside
+        var current = descriptionNode->AtkResNode.ParentNode;
+        var depth = 0;
+        while (current != null && depth < 32)
+        {
+            if (current == node) return true;
+
+            current = current->ParentNode;
+            depth++;
+        }
+
+        return false;
     }
 
     private static void ApplyDescriptionLayout(AtkUnitBase* addon, DescriptionLayoutSnapshot snapshot, float shift)
