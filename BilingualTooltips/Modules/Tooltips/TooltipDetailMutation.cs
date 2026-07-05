@@ -145,7 +145,7 @@ sealed unsafe class TooltipDetailMutation
             _addonContract.NativeDescriptionDividerNodeId);
         if (dividerSourceNode == null) return;
 
-        var snapshot = CaptureDescriptionLayout(addon, descriptionNode);
+        var snapshot = CaptureDescriptionLayout(addon, descriptionNode, dividerSourceNode);
         var translationNode = AddonNodes.CreateTextNodeFromSourceBefore(
             addon,
             descriptionNode,
@@ -234,7 +234,10 @@ sealed unsafe class TooltipDetailMutation
         bool updateDrawNodeList = true) =>
         AddonNodes.CreateNineGridNodeFromSourceBefore(addon, sourceNode, insertNode, nodeId, updateDrawNodeList);
 
-    private DescriptionLayoutSnapshot CaptureDescriptionLayout(AtkUnitBase* addon, AtkTextNode* descriptionNode)
+    private DescriptionLayoutSnapshot CaptureDescriptionLayout(
+        AtkUnitBase* addon,
+        AtkTextNode* descriptionNode,
+        AtkNineGridNode* dividerSourceNode)
     {
         var windowHeight = addon->WindowNode == null
             ? (ushort?)null
@@ -244,7 +247,7 @@ sealed unsafe class TooltipDetailMutation
             ? (ushort?)null
             : windowBackground->Height;
         var descriptionY = descriptionNode->AtkResNode.Y;
-        var descriptionScreenY = descriptionNode->AtkResNode.ScreenY;
+        var dividerScreenY = GetComputedScreenY((AtkResNode*)dividerSourceNode);
         var snapshot = new DescriptionLayoutSnapshot(
             (nint)addon,
             addon->Y,
@@ -259,9 +262,10 @@ sealed unsafe class TooltipDetailMutation
         {
             var node = addon->UldManager.NodeList[i];
             if (node == null
+                || node == (AtkResNode*)dividerSourceNode
                 || IsPluginNode(node)
                 || !node->IsVisible()
-                || node->ScreenY + DescriptionCaptureScreenYTolerance < descriptionScreenY)
+                || GetComputedScreenY(node) + DescriptionCaptureScreenYTolerance < dividerScreenY)
             {
                 continue;
             }
@@ -360,6 +364,21 @@ sealed unsafe class TooltipDetailMutation
         node == null
             ? 0f
             : node->Height * MathF.Max(0f, node->ScaleY);
+
+    private static float GetComputedScreenY(AtkResNode* node)
+    {
+        var screenY = 0f;
+        var current = node;
+        var depth = 0;
+        while (current != null && depth < 32)
+        {
+            screenY += current->Y;
+            current = current->ParentNode;
+            depth++;
+        }
+
+        return screenY;
+    }
 
     private static void ClampAddonBottomToViewport(
         AtkUnitBase* addon,
