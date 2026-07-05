@@ -146,14 +146,18 @@ public sealed class TooltipHandler
         (ushort)_plugin.Config.ItemDescriptionColourKey,
         _plugin.Config.OffsetItemNameTranslation,
         _plugin.Config.OffsetItemNameNative,
-        _plugin.Config.TooltipNameMaxLineWidth);
+        _plugin.Config.TooltipNameMaxLineWidth,
+        _plugin.Config.TooltipDescriptionDividerGapBefore,
+        _plugin.Config.TooltipDescriptionDividerGapAfter);
 
     private TooltipDetailAppearance GetActionDetailAppearance() => new(
         (ushort)_plugin.Config.ActionNameColourKey,
         (ushort)_plugin.Config.ActionDescriptionColourKey,
         _plugin.Config.OffsetActionNameTranslation,
         _plugin.Config.OffsetActionNameNative,
-        _plugin.Config.TooltipNameMaxLineWidth);
+        _plugin.Config.TooltipNameMaxLineWidth,
+        _plugin.Config.TooltipDescriptionDividerGapBefore,
+        _plugin.Config.TooltipDescriptionDividerGapAfter);
 
     private static string ResolveItemDisplayName(ulong itemId)
     {

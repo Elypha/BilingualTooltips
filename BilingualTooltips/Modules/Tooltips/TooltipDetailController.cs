@@ -82,7 +82,9 @@ sealed unsafe class TooltipDetailController
             _mutation.ApplyDescription(
                 addon,
                 pendingUpdate.Content.Description,
-                appearance.DescriptionColourKey);
+                appearance.DescriptionColourKey,
+                appearance.DescriptionDividerGapBefore,
+                appearance.DescriptionDividerGapAfter);
         }
         finally
         {
@@ -119,4 +121,6 @@ readonly record struct TooltipDetailAppearance(
     ushort DescriptionColourKey,
     float NameTranslationOffset,
     float NativeNameOffset,
-    float NameMaxLineWidth);
+    float NameMaxLineWidth,
+    float DescriptionDividerGapBefore,
+    float DescriptionDividerGapAfter);

@@ -8,8 +8,6 @@ namespace BilingualTooltips.Modules;
 sealed unsafe class TooltipDetailMutation
 {
     private const ushort NameMeasurementWidth = 1024;
-    private const float TooltipDescriptionDividerBeforeGapLineFactor = 0.67f;
-    private const float TooltipDescriptionDividerAfterGapLineFactor = 0.05f;
     private const float DescriptionCaptureScreenYTolerance = 0.5f;
 
     private readonly TooltipDetailAddonContract _addonContract;
@@ -133,7 +131,9 @@ sealed unsafe class TooltipDetailMutation
     public void ApplyDescription(
         AtkUnitBase* addon,
         string translation,
-        ushort colourKey)
+        ushort colourKey,
+        float dividerGapBefore,
+        float dividerGapAfter)
     {
         if (addon == null || string.IsNullOrEmpty(translation)) return;
 
@@ -175,10 +175,10 @@ sealed unsafe class TooltipDetailMutation
         translationNode->SetWidth(descriptionNode->AtkResNode.Width);
         translationNode->AtkResNode.SetPositionFloat(descriptionNode->AtkResNode.X, snapshot.DescriptionY);
 
-        var dividerGap = GetDescriptionDividerGap(descriptionNode, dividerSourceNode);
+        var dividerGap = MathF.Max(0f, descriptionNode->AtkResNode.Y - (dividerSourceNode->AtkResNode.Y + GetScaledHeight((AtkResNode*)dividerSourceNode)));
         var dividerY = snapshot.DescriptionY
             + translationNode->AtkResNode.Height
-            + GetDescriptionDividerBreathingGap(translationNode, TooltipDescriptionDividerBeforeGapLineFactor)
+            + dividerGapBefore
             + dividerGap;
         var dividerResNode = (AtkResNode*)dividerNode;
         dividerResNode->SetPositionFloat(dividerSourceNode->AtkResNode.X, dividerY);
@@ -186,7 +186,7 @@ sealed unsafe class TooltipDetailMutation
         var shift = dividerY
             + GetScaledHeight(dividerResNode)
             + dividerGap
-            + GetDescriptionDividerBreathingGap(translationNode, TooltipDescriptionDividerAfterGapLineFactor)
+            + dividerGapAfter
             - snapshot.DescriptionY;
 
         _descriptionLayoutSnapshot = snapshot;
@@ -355,16 +355,6 @@ sealed unsafe class TooltipDetailMutation
 
         return false;
     }
-
-    private static float GetDescriptionDividerGap(AtkTextNode* descriptionNode, AtkNineGridNode* dividerNode) =>
-        descriptionNode == null || dividerNode == null
-            ? 0f
-            : MathF.Max(0f, descriptionNode->AtkResNode.Y - (dividerNode->AtkResNode.Y + GetScaledHeight((AtkResNode*)dividerNode)));
-
-    private static float GetDescriptionDividerBreathingGap(AtkTextNode* descriptionTranslationNode, float lineFactor) =>
-        descriptionTranslationNode == null
-            ? 0f
-            : MathF.Ceiling(descriptionTranslationNode->LineSpacing * lineFactor);
 
     private static float GetScaledHeight(AtkResNode* node) =>
         node == null

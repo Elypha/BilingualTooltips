@@ -219,5 +219,21 @@ public partial class ConfigWindow
             onChanged: MioConfig.Save);
         ImGuiComponents.HelpMarker(
             "Maximum width in pixels for item, action, minion, and mount names before horizontal compression.");
+        SettingsRows.DefaultedInputFloat(
+            layout,
+            "Divider gap before",
+            $"{suffix}TooltipDescriptionDividerGapBefore",
+            ref _plugin.Config.TooltipDescriptionDividerGapBefore,
+            DefaultConfig.TooltipDescriptionDividerGapBefore,
+            onChanged: MioConfig.Save);
+        SettingsRows.DefaultedInputFloat(
+            layout,
+            "Divider gap after",
+            $"{suffix}TooltipDescriptionDividerGapAfter",
+            ref _plugin.Config.TooltipDescriptionDividerGapAfter,
+            DefaultConfig.TooltipDescriptionDividerGapAfter,
+            onChanged: MioConfig.Save);
+        ImGuiComponents.HelpMarker(
+            "Additional pixels before and after the divider below translated descriptions. Minimum value is 0.");
     }
 }

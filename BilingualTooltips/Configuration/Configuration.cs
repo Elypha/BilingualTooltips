@@ -48,6 +48,8 @@ public class BilingualTooltipsConfig : IMioConfig
     public float OffsetActionNameNative = -0.5f;
     public float OffsetActionNameTranslation = -8.0f;
     public ushort TooltipNameMaxLineWidth = 300;
+    public float TooltipDescriptionDividerGapBefore = 4.0f;
+    public float TooltipDescriptionDividerGapAfter = 0.0f;
 
     // game ui
     // --------------------------------
@@ -82,4 +84,15 @@ public class BilingualTooltipsConfig : IMioConfig
     public string TalkDialogueRenderProfileFirstName = "";
     public string TalkDialogueRenderProfileLastName = "";
     public BttDialogueGender TalkDialogueRenderProfileGender = BttDialogueGender.Unspecified;
+
+    public void Normalise()
+    {
+        TooltipDescriptionDividerGapBefore = NormaliseNonNegative(TooltipDescriptionDividerGapBefore);
+        TooltipDescriptionDividerGapAfter = NormaliseNonNegative(TooltipDescriptionDividerGapAfter);
+    }
+
+    private static float NormaliseNonNegative(float value) =>
+        float.IsFinite(value)
+            ? MathF.Max(0f, value)
+            : 0f;
 }
