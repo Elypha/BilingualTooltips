@@ -646,7 +646,7 @@ public sealed class DialogueHandler : IDisposable
     // --------------------------------
     private void RequestResourcePanelOpen()
     {
-        if (_disposed) return;
+        if (_disposed || !_plugin.Config.TalkDialogueEnabled) return;
 
         try
         {
